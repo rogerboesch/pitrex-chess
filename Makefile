@@ -3,7 +3,7 @@ BUILD_DIR := build/
 PITREX_DIR := ../../pitrex/pitrex/pitrex/
 VECTREX_DIR := ../../pitrex/pitrex/vectrex/
 SETTINGS := /opt/pitrex/settings
-CFLAGS := -g -I../../pitrex/pitrex/ -DSETTINGS_DIR="\"$(SETTINGS)\"" -DPIZERO -DRPI0 -DPITREX
+CFLAGS := -g -I../../pitrex/pitrex/ -DSETTINGS_DIR="\"$(SETTINGS)\"" -DPIZERO -DRPI0 -DPITREX -lpthread
 # CFLAGS := -Ofast -I../pitrex/ -DPIZERO -DRPI0
 CC := gcc
 

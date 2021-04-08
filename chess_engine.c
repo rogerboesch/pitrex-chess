@@ -228,11 +228,12 @@ int flip[64] = {
   0, 1, 2, 3, 4, 5, 6, 7
 };
 
+
+// MARK: - Move generations
+
 static int is_in_check(int current_side);
 static int is_attacked(int current_side, int k);
 static int quiescent(int alpha, int beta);
-
-// MARK: - Move generations
 
 static void generate_push(int from, int dest, int type, MOVE * pBuf, int *pMCount) {
     MOVE move;

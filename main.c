@@ -1,6 +1,7 @@
 
 #include "platform.h"
 #include <stdio.h>
+#include <pthread.h>
 
 // MARK: -  Chess engine calls
 
@@ -8,6 +9,7 @@ int chess_piece_at(int row, int col);
 int chess_user_move(int from, int dest);
 void chess_computer_move(void);
 void chess_initialize(void);
+void chess_callback(void);
 
 // MARK: - Graphic assets
 
@@ -142,7 +144,7 @@ const int *pieces[8] = {castle, knight, bishop, queen, king, bishop, knight, cas
 const int *piece_type[6] = {pawn, knight, bishop, castle, queen, king};
 
 typedef enum _GAME_STATE {
-    GAME_INITIALIZE, GAME_START, COMPUTER_MOVE, PLAYER_CHOOSE_FROM, PLAYER_CHOOSE_TO, PLAYER_MOVE, GAME_END
+    GAME_INITIALIZE, GAME_START, COMPUTER_THINK, COMPUTER_MOVED, PLAYER_CHOOSE_FROM, PLAYER_CHOOSE_TO, PLAYER_MOVE, GAME_END
 } GAME_STATE;
 
 // MARK: - Forwards
@@ -372,6 +374,29 @@ void wait_for_begin() {
 
 // MARK: - Chess
 
+void* threadFunction(void* args) {
+	printf("Start thinking in thread\n");
+	chess_computer_move();
+	game_state = COMPUTER_MOVED;
+	printf("End of thinking in thread\n");
+}
+
+void computer_move() {
+	pthread_t id;
+    int ret;
+
+    // creating thread
+    ret = pthread_create(&id, NULL, &threadFunction,NULL);
+    if (ret==0) {
+    	printf("Thinking thread created successfully.\n");
+    }
+    else {
+        printf("Thread not created.\n");
+    }
+
+    game_state = COMPUTER_THINK;
+}
+
 void user_move() {
     int from = game_from_y*8+game_from_x;
     int to = game_to_y*8+game_to_x;
@@ -446,13 +471,16 @@ boolean game_frame(void) {
             print_msg("PRESS BUTTON TO START");
             break;
         case GAME_START:
-            game_state = COMPUTER_MOVE;
+            computer_move();
             break;
-        case COMPUTER_MOVE:
+        case COMPUTER_THINK:
+        	draw_board();
+        	print_msg("THINKING...");
+        	break;
+        case COMPUTER_MOVED:
             game_from_x = 0; game_from_y = 0;
             game_to_x = 0; game_to_y = 0;
 
-            chess_computer_move();
             update_board();
             
             if (game_win()) {
@@ -486,7 +514,7 @@ boolean game_frame(void) {
                 game_state = GAME_END;
             }
             else {
-                game_state = COMPUTER_MOVE;
+                computer_move();
             }
             break;
         case GAME_END:
