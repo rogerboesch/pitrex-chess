@@ -377,7 +377,20 @@ void build_from_position() {
 	#define HORIZ "ABCDEFGH"
     char h = HORIZ[game_from_x];
 
-    sprintf(temp, "YOUR MOVE. CHOOSE FROM %c%d", h, 8-game_from_y);
+    sprintf(temp, "FROM %c%d TO", h, 8-game_from_y);
+}
+
+void build_from_to_position() {
+	if (game_from_x == 0 && game_from_y == 0) {
+		sprintf(temp, "");
+		return;
+	}
+	
+	#define HORIZ "ABCDEFGH"
+    char h1 = HORIZ[game_from_x];
+    char h2 = HORIZ[game_to_x];
+
+    sprintf(temp, "YOUR MOVE %c%d TO %c%d", h1, 8-game_from_y, h2, 8-game_from_y);
 }
 
 // MARK: - Chess
@@ -445,7 +458,7 @@ void init_board() {
 
 // MARK: - User message
 
-void print_info(char* msg) {
+void print_info_top(char* msg) {
     platform_msg(msg, -100, 120, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
 }
 
@@ -485,8 +498,10 @@ boolean game_frame(void) {
             computer_move();
             break;
         case COMPUTER_THINK:
-        	draw_board();
-        	print_info("THINKING...");
+        	build_from_to_position();
+            print_info_top(temp);
+
+        	print_msg("THINKING...");
         	break;
         case COMPUTER_MOVED:
             game_from_x = 0; game_from_y = 0;
@@ -502,14 +517,14 @@ boolean game_frame(void) {
             }
             break;
         case PLAYER_CHOOSE_FROM:
-            print_info("YOUR MOVE. CHOOSE FIGURE!");
+            print_info_top("YOUR MOVE");
             
             choose_from_move();
             draw_from_move();
             break;
         case PLAYER_CHOOSE_TO:
         	build_from_position();
-            print_info(temp);
+            print_info_top(temp);
 
             choose_to_move();
             draw_choosen_from_move();
@@ -517,7 +532,6 @@ boolean game_frame(void) {
             break;
         case PLAYER_MOVE:
             user_move();
-
             update_board();
 
             if (game_win()) {
