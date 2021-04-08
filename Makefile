@@ -38,8 +38,8 @@ $(BUILD_DIR)baremetalUtil.o: $(VECTREX_DIR)baremetalUtil.c
 
 
 # project files
-$(BUILD_DIR)main.o: main.c
-	$(CC) $(CFLAGS) -o $(BUILD_DIR)main.o -c main.c
+$(BUILD_DIR)chess_main.o: chess_main.c
+	$(CC) $(CFLAGS) -o $(BUILD_DIR)chess_main.o -c chess_main.c
 
 $(BUILD_DIR)chess_engine.o: chess_engine.c
 	$(CC) $(CFLAGS) -o $(BUILD_DIR)chess_engine.o -c chess_engine.c
@@ -49,7 +49,7 @@ $(BUILD_DIR)platform.o: platform.c
 
 
 # build
-chess: $(BUILD_DIR)main.o $(BUILD_DIR)chess_engine.o $(BUILD_DIR)platform.o $(BUILD_DIR)bcm2835.o $(BUILD_DIR)pitrexio-gpio.o $(BUILD_DIR)vectrexInterface.o $(BUILD_DIR)osWrapper.o $(BUILD_DIR)baremetalUtil.o
+chess: $(BUILD_DIR)chess_main.o $(BUILD_DIR)chess_engine.o $(BUILD_DIR)platform.o $(BUILD_DIR)bcm2835.o $(BUILD_DIR)pitrexio-gpio.o $(BUILD_DIR)vectrexInterface.o $(BUILD_DIR)osWrapper.o $(BUILD_DIR)baremetalUtil.o
 	$(RM) chess
 	$(CC) $(CFLAGS) -o chess \
 	$(BUILD_DIR)bcm2835.o \
@@ -57,7 +57,7 @@ chess: $(BUILD_DIR)main.o $(BUILD_DIR)chess_engine.o $(BUILD_DIR)platform.o $(BU
 	$(BUILD_DIR)vectrexInterface.o \
 	$(BUILD_DIR)osWrapper.o \
 	$(BUILD_DIR)baremetalUtil.o \
-	$(BUILD_DIR)main.o \
+	$(BUILD_DIR)chess_main.o \
 	$(BUILD_DIR)chess_engine.o \
 	$(BUILD_DIR)platform.o
 

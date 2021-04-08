@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #else
 
@@ -153,12 +154,36 @@ void platform_draw_line(int x1, int y1, int x2, int y2, int color) {
 	#define DAC 19000
 	#define MAX_DAC DAC*2
 	
-	int xx1 = DAC - MAX_DAC * x1 / 400;
+	int xx1 = MAX_DAC * x1 / 400 - DAC;
 	int yy1 = DAC - MAX_DAC * y1 / 400;
-	int xx2 = DAC - MAX_DAC * x2 / 400;
+	int xx2 = MAX_DAC * x2 / 400 - DAC;
 	int yy2 = DAC - MAX_DAC * y2 / 400;
 
 	v_directDraw32(xx1, yy1, xx2, yy2, color);
+}
+
+void platform_draw_lineby(int x1, int y1, int color) {
+	#define DAC 19000
+	#define MAX_DAC DAC*2
+	
+	int xx1 = MAX_DAC * x1 / 400;
+	int yy1 = MAX_DAC * y1 / 400;
+
+	//printf("->Draw line by: %d,%d (%d,%d)\n", xx1, yy1, x1, y1);
+
+	v_directDeltaDraw32(xx1, yy1, color);
+}
+
+void platform_moveto(int x1, int y1) {
+	#define DAC 19000
+	#define MAX_DAC DAC*2
+	
+	int xx1 = MAX_DAC * x1 / 400 - DAC;
+	int yy1 = DAC - MAX_DAC * y1 / 400;
+
+	//printf("Moveto: %d,%d\n", xx1, yy1);
+
+	v_directMove32(xx1, yy1);
 }
 
 void platform_draw_points(int* points, int count, int color) {
@@ -195,6 +220,47 @@ void platform_draw_points(int* points, int count, int color) {
         
         x1 = x2;
         y1 = y2;
+        
+        index += 2;
+    }
+}
+
+void platform_draw_continous_points(int* points, int count, int color) {
+    int index = 2;
+    int* offset = points;
+
+//for (int i = 0; i < count; i++) {
+//	printf("%d: %d\n", i, *offset);
+//	offset++;
+//}
+//exit(1);
+
+	//printf("Draw points: %d (%d)\n", count, color);
+    if (count < 2)
+        return;
+
+    if (count % 2 != 0)
+        return;
+
+    int x1 = *offset;
+    offset++;
+    int y1 = *offset;
+    offset++;
+
+    if (count == 2) {
+		platform_moveto(x1, y1);
+        return;
+    }
+
+	platform_moveto(x1, y1);
+
+    while (index < count) {
+        x1 = *offset;
+        offset++;
+        y1 = *offset;
+        offset++;
+
+        platform_draw_lineby(x1, y1, color);
         
         index += 2;
     }

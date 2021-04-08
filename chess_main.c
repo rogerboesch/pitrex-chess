@@ -172,19 +172,19 @@ void draw_rect(int row, int col) {
     points[points_count++] = x;
     points[points_count++] = y;
 
-    points[points_count++] = x+HSPACING;
-    points[points_count++] = y;
+    points[points_count++] = HSPACING;
+    points[points_count++] = 0;
 
-    points[points_count++] = x+HSPACING;
-    points[points_count++] = y-VSPACING;
+    points[points_count++] = 0;
+    points[points_count++] = VSPACING;
 
-    points[points_count++] = x;
-    points[points_count++] = y-VSPACING;
+    points[points_count++] = -HSPACING;
+    points[points_count++] = 0;
 
-    points[points_count++] = x;
-    points[points_count++] = y;
+    points[points_count++] = 0;
+    points[points_count++] = -VSPACING;
     
-    platform_draw_points(&points[0], points_count, DEFAULT_COLOR);
+    platform_draw_continous_points(&points[0], points_count, DEFAULT_COLOR);
 }
 
 void draw_marker(int row, int col) {

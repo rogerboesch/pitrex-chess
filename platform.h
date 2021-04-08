@@ -36,6 +36,7 @@ void platform_input_wait(void);
 #define  DEFAULT_INPUT_WAIT_TIME 30
 
 void platform_draw_points(int* points, int count, int color);
+void platform_draw_continous_points(int* points, int count, int color);
 void platform_msg(char* msg, int x, int y, int size, int color);
 
 #endif
