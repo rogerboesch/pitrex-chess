@@ -197,14 +197,14 @@ void draw_marker(int row, int col) {
 
     points[points_count++] = x;
     points[points_count++] = y;
-    points[points_count++] = x+HSPACING;
-    points[points_count++] = y;
-    points[points_count++] = x+HSPACING;
-    points[points_count++] = y-2;
-    points[points_count++] = x;
-    points[points_count++] = y-2;
+    points[points_count++] = HSPACING;
+    points[points_count++] = 0;
+    points[points_count++] = 0;
+    points[points_count++] = -2;
+    points[points_count++] = -HSPACING;
+    points[points_count++] = 0;
 
-    platform_draw_points(&points[0], points_count, DEFAULT_COLOR);
+    platform_draw_continous_points(&points[0], points_count, DEFAULT_COLOR);
 }
 
 void draw_lines(const int *lines, int row, int col) {
