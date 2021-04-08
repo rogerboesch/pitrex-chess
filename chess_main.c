@@ -224,7 +224,7 @@ void draw_lines(const int *lines, int row, int col) {
         int f = *lines;
 
         if (f == 1 || f == 2) {
-            platform_draw_points(&points[0], points_count, DEFAULT_COLOR);
+            platform_draw_continous_points(&points[0], points_count, DEFAULT_COLOR);
             return;
         }
 
@@ -234,13 +234,10 @@ void draw_lines(const int *lines, int row, int col) {
         lines++;
         int yOff = *lines;
 
-        x = x + yOff;
-        y = y - xOff;
-
         lines++;
 
-        points[points_count++] = x;
-        points[points_count++] = y;
+        points[points_count++] = yOff;
+        points[points_count++] = xOff;
     }
 }
 
