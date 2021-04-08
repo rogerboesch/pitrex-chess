@@ -1430,7 +1430,7 @@ MOVE computer_think(int depth) {
         decimal_score = -decimal_score;
     }
 
-    printf("ab_search result: move = %c%d%c%d; depth = %d, score = %.2f, time = %.2fs knps = %.2f\n countCapCalls = %d\n countQSearch = %d\n moves made = %d\n ratio_Qsearc_Capcalls = %.2f\n",
+    printf("Search result: move = %c%d%c%d; depth = %d, score = %.2f, time = %.2fs knps = %.2f\n- countCapCalls = %d\n- countQSearch = %d\n- moves made = %d\n- ratio_Qsearc_Capcalls = %.2f\n",
            'a' + COL (m.from), 8 - ROW (m.from), 'a' + COL (m.dest), 8 - ROW (m.dest), depth, decimal_score, t, knps, count_cap_calls, count_quies_calls, count_MakeMove, ratio_Qsearc_Capcalls);
 
     return m;

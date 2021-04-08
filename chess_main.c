@@ -158,6 +158,8 @@ int game_colour;
 int game_board[8][8] = {};
 int game_from_x, game_from_y;
 int game_to_x, game_to_y;
+int draw_color = DEFAULT_COLOR;
+char temp[256];
 
 // MARK: - drawing helpers
 
@@ -184,7 +186,7 @@ void draw_rect(int row, int col) {
     points[points_count++] = 0;
     points[points_count++] = -VSPACING;
     
-    platform_draw_continous_points(&points[0], points_count, DEFAULT_COLOR);
+    platform_draw_continous_points(&points[0], points_count, HIGHLIGHT_COLOR);
 }
 
 void draw_marker(int row, int col) {
@@ -204,10 +206,10 @@ void draw_marker(int row, int col) {
     points[points_count++] = -HSPACING;
     points[points_count++] = 0;
 
-    platform_draw_continous_points(&points[0], points_count, DEFAULT_COLOR);
+    platform_draw_continous_points(&points[0], points_count,HIGHLIGHT_COLOR);
 }
 
-void draw_lines(const int *lines, int row, int col) {
+void draw_lines(const int *lines, int row, int col, int color) {
     float x = LEFTMARGIN + col * HSPACING;
     float y = TOPMARGIN + row * VSPACING;
 
@@ -224,7 +226,7 @@ void draw_lines(const int *lines, int row, int col) {
         int f = *lines;
 
         if (f == 1 || f == 2) {
-            platform_draw_continous_points(&points[0], points_count, DEFAULT_COLOR);
+            platform_draw_continous_points(&points[0], points_count, color);
             return;
         }
 
@@ -243,8 +245,8 @@ void draw_lines(const int *lines, int row, int col) {
 
 // MARK: - Board drawing
 
-void draw_piece(const int *piece, int row, int col) {
-    draw_lines((int *)piece+game_colour, row, col);
+void draw_piece(const int *piece, int row, int col, int color) {
+    draw_lines((int *)piece+game_colour, row, col, color);
 }
 
 void draw_board_piece(int row, int col) {
@@ -255,13 +257,15 @@ void draw_board_piece(int row, int col) {
     }
     
     game_colour = WHITE;
+    draw_color = DEFAULT_COLOR;
     
     if (index > 9) {
         index -= BLACK_OFFSET;
         game_colour = BLACK;
+        draw_color = HIGHLIGHT_COLOR;
     }
     
-    draw_piece(piece_type[index-1], row, col);
+    draw_piece(piece_type[index-1], row, col, draw_color);
 }
 
 void draw_board() {
@@ -369,6 +373,13 @@ void wait_for_begin() {
     }
 }
 
+void build_from_position() {
+	#define HORIZ "ABCDEFGH"
+    char h = HORIZ[game_from_x];
+
+    sprintf(temp, "YOUR MOVE. CHOOSE FROM %c%d", h, 8-game_from_y);
+}
+
 // MARK: - Chess
 
 void* threadFunction(void* args) {
@@ -434,8 +445,12 @@ void init_board() {
 
 // MARK: - User message
 
+void print_info(char* msg) {
+    platform_msg(msg, -100, 120, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+}
+
 void print_msg(char* msg) {
-    platform_msg(msg, -100, 0, DEFAULT_TEXT_SIZE, DEFAULT_COLOR);
+    platform_msg(msg, -80, 0, DEFAULT_TEXT_SIZE, DEFAULT_COLOR);
 }
 
 // MARK: - Game loop
@@ -452,12 +467,11 @@ void game_stop(void) {
 }
 
 boolean game_frame(void) {
-    char temp[256];
-    
     platform_frame();
     
     if (platform_button_is_pressed(BUTTON_FOUR)) {
-        return false;
+		// Press all 4 button to stop is implemented in system
+        //return false;
     }
 
     draw_board();
@@ -472,7 +486,7 @@ boolean game_frame(void) {
             break;
         case COMPUTER_THINK:
         	draw_board();
-        	print_msg("THINKING...");
+        	print_info("THINKING...");
         	break;
         case COMPUTER_MOVED:
             game_from_x = 0; game_from_y = 0;
@@ -488,15 +502,14 @@ boolean game_frame(void) {
             }
             break;
         case PLAYER_CHOOSE_FROM:
-            print_msg("YOUR MOVE");
+            print_info("YOUR MOVE. CHOOSE FIGURE!");
             
             choose_from_move();
             draw_from_move();
             break;
         case PLAYER_CHOOSE_TO:
-//
-            sprintf(temp, "MOVE FROM %s to ?", "x");
-            print_msg("MOVE TO");
+        	build_from_position();
+            print_info(temp);
 
             choose_to_move();
             draw_choosen_from_move();
@@ -515,6 +528,7 @@ boolean game_frame(void) {
             }
             break;
         case GAME_END:
+            print_msg("GAME ENDED");
             break;
     }
     

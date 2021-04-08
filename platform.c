@@ -34,6 +34,9 @@ void v_printString(int x, int y, char* str, int textSize, int brightness) { prin
 
 #endif
 
+#define MAX_DAC 32000
+#define DAC MAX_DAC/2
+
 boolean platform_wait = false;
 int platform_wait_count = 0;
 
@@ -129,11 +132,11 @@ boolean platform_button_is_pressed(int number) {
                 return true;
             break;
         case 3:
-            if ((currentButtonState&0x03) == (0x03))
+            if ((currentButtonState&0x04) == (0x04))
                 return true;
             break;
         case 4:
-            if ((currentButtonState&0x04) == (0x04))
+            if ((currentButtonState&0x08) == (0x08))
                 return true;
             break;
 
@@ -151,9 +154,6 @@ void platform_msg(char* msg, int x, int y, int size, int color) {
 }
 
 void platform_draw_line(int x1, int y1, int x2, int y2, int color) {
-	#define DAC 19000
-	#define MAX_DAC DAC*2
-	
 	int xx1 = MAX_DAC * x1 / 400 - DAC;
 	int yy1 = DAC - MAX_DAC * y1 / 400;
 	int xx2 = MAX_DAC * x2 / 400 - DAC;
@@ -163,25 +163,15 @@ void platform_draw_line(int x1, int y1, int x2, int y2, int color) {
 }
 
 void platform_draw_lineby(int x1, int y1, int color) {
-	#define DAC 19000
-	#define MAX_DAC DAC*2
-	
 	int xx1 = MAX_DAC * x1 / 400;
 	int yy1 = MAX_DAC * y1 / 400;
-
-	//printf("->Draw line by: %d,%d (%d,%d)\n", xx1, yy1, x1, y1);
 
 	v_directDeltaDraw32(xx1, yy1, color);
 }
 
-void platform_moveto(int x1, int y1) {
-	#define DAC 19000
-	#define MAX_DAC DAC*2
-	
+void platform_moveto(int x1, int y1) {	
 	int xx1 = MAX_DAC * x1 / 400 - DAC;
 	int yy1 = DAC - MAX_DAC * y1 / 400;
-
-	//printf("Moveto: %d,%d\n", xx1, yy1);
 
 	v_directMove32(xx1, yy1);
 }
@@ -189,8 +179,6 @@ void platform_moveto(int x1, int y1) {
 void platform_draw_points(int* points, int count, int color) {
     int index = 2;
     int* offset = points;
-
-	//printf("Draw points: %d (%d)\n", count, color);
 	
     if (count < 2)
         return;
@@ -214,8 +202,6 @@ void platform_draw_points(int* points, int count, int color) {
         int y2 = *offset;
         offset++;
 
-        // printf(" > %d,%d,%d,%d\n", x1, y1, x2, y2);
-
         platform_draw_line(x1, y1, x2, y2, color);
         
         x1 = x2;
@@ -229,13 +215,6 @@ void platform_draw_continous_points(int* points, int count, int color) {
     int index = 2;
     int* offset = points;
 
-//for (int i = 0; i < count; i++) {
-//	printf("%d: %d\n", i, *offset);
-//	offset++;
-//}
-//exit(1);
-
-	//printf("Draw points: %d (%d)\n", count, color);
     if (count < 2)
         return;
 
