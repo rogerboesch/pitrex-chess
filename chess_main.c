@@ -1,15 +1,16 @@
 
 #include "platform.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <pthread.h>
 
 // MARK: -  Chess engine calls
 
+void chess_last_move(int* from_col, int* from_row, int* to_col, int* to_row);
 int chess_piece_at(int row, int col);
 int chess_user_move(int from, int dest);
 void chess_computer_move(void);
 void chess_initialize(void);
-void chess_callback(void);
 
 // MARK: - Graphic assets
 
@@ -144,7 +145,9 @@ const int *pieces[8] = {castle, knight, bishop, queen, king, bishop, knight, cas
 const int *piece_type[6] = {pawn, knight, bishop, castle, queen, king};
 
 typedef enum _GAME_STATE {
-    GAME_INITIALIZE, GAME_START, COMPUTER_THINK, COMPUTER_MOVED, PLAYER_CHOOSE_FROM, PLAYER_CHOOSE_TO, PLAYER_MOVE, PLAYER_ANIMATE, PLAYER_ANIMATE_END, GAME_END
+    GAME_INITIALIZE, GAME_START, GAME_END,
+    COMPUTER_THINK, COMPUTER_MOVED, COMPUTER_ANIMATE, COMPUTER_ANIMATE_END,
+    PLAYER_CHOOSE_FROM, PLAYER_CHOOSE_TO, PLAYER_MOVE, PLAYER_ANIMATE, PLAYER_ANIMATE_END
 } GAME_STATE;
 
 // MARK: - Forwards
@@ -159,7 +162,11 @@ int game_board[8][8] = {};
 int game_from_x, game_from_y;
 int game_to_x, game_to_y;
 int draw_color = DEFAULT_COLOR;
+
+#define ANIMATION_TIME 5
 char temp[256];
+int animation_counter = 0;
+int animation_time = 0;
 
 // MARK: - drawing helpers
 
@@ -408,13 +415,15 @@ void build_from_to_position() {
 
 // MARK: - Animate figure
 
+int distance() {
+    int dist = abs(game_to_y - game_from_y) + abs(game_to_x - game_from_x);
+    return dist;
+}
+
 int lerp(int a, int b, int time, int duration) {
     int r = a+((b-a)*time/duration);
     return r;
 }
-
-int counter = 0;
-#define ANIMATION_TIME 20
 
 void animate_piece() {
     int index = game_board[game_from_y][game_from_x];
@@ -441,21 +450,36 @@ void animate_piece() {
     int y = y1;
     
     if (x1 != x2) {
-        x = lerp(x1, x2, counter, ANIMATION_TIME);
+        x = lerp(x1, x2, animation_counter, ANIMATION_TIME);
     }
     
     if (y1 != y2) {
-        y = lerp(y1, y2, counter, ANIMATION_TIME);
+        y = lerp(y1, y2, animation_counter, ANIMATION_TIME);
         printf("Y LERP: %d (%d > %d)\n", y, y1, y2);
     }
     
     draw_piece_xy(piece_type[index-1], x, y, draw_color);
+}
+
+void animate_player() {
+    animate_piece();
     
-    if (counter >= ANIMATION_TIME) {
+    if (animation_counter >= ANIMATION_TIME) {
         game_state = PLAYER_ANIMATE_END;
     }
     else {
-        counter++;
+        animation_counter++;
+    }
+}
+
+void animate_computer() {
+    animate_piece();
+
+    if (animation_counter >= ANIMATION_TIME) {
+        game_state = COMPUTER_ANIMATE_END;
+    }
+    else {
+        animation_counter++;
     }
 }
 
@@ -464,9 +488,12 @@ void animate_piece() {
 void* threadFunction(void* args) {
 	printf("Start thinking in thread\n");
 	chess_computer_move();
-	game_state = COMPUTER_MOVED;
 	printf("End of thinking in thread\n");
+
+    chess_last_move(&game_from_x, &game_from_y, &game_to_x, &game_to_y);
     
+    game_state = COMPUTER_MOVED;
+
     return 0;
 }
 
@@ -474,16 +501,16 @@ void computer_move() {
 	pthread_t id;
     int ret;
 
+    game_state = COMPUTER_THINK;
+
     // creating thread
     ret = pthread_create(&id, NULL, &threadFunction,NULL);
-    if (ret==0) {
+    if (ret == 0) {
     	printf("Thinking thread created successfully.\n");
     }
     else {
         printf("Thread not created.\n");
     }
-
-    game_state = COMPUTER_THINK;
 }
 
 void user_move() {
@@ -572,6 +599,14 @@ boolean game_frame(void) {
         	print_msg("THINKING...");
         	break;
         case COMPUTER_MOVED:
+            animation_counter = 0;
+            animation_time = distance() * ANIMATION_TIME;
+            game_state = COMPUTER_ANIMATE;
+            break;
+        case COMPUTER_ANIMATE:
+            animate_computer();
+            break;
+        case COMPUTER_ANIMATE_END:
             game_from_x = 0; game_from_y = 0;
             game_to_x = 0; game_to_y = 0;
 
@@ -601,11 +636,12 @@ boolean game_frame(void) {
         case PLAYER_MOVE:
             user_move();
             
-            counter = 0;
+            animation_counter = 0;
+            animation_time = distance() * ANIMATION_TIME;
             game_state = PLAYER_ANIMATE;
             break;
         case PLAYER_ANIMATE:
-            animate_piece();
+            animate_player();
             break;
         case PLAYER_ANIMATE_END:
             update_board();

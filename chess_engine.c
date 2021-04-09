@@ -84,6 +84,11 @@ int initialise_color[64] = {
   WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE
 };
 
+int computer_move_from_x = 0;
+int computer_move_from_y = 0;
+int computer_move_to_x = 0;
+int computer_move_to_y = 0;
+
 int side;               // Side to move, value = BLACK or WHITE
 int computer_side;
 int max_depth;          // Max depth to ab_search
@@ -1433,6 +1438,11 @@ MOVE computer_think(int depth) {
     printf("Search result: move = %c%d%c%d; depth = %d, score = %.2f, time = %.2fs knps = %.2f\n- countCapCalls = %d\n- countQSearch = %d\n- moves made = %d\n- ratio_Qsearc_Capcalls = %.2f\n",
            'a' + COL (m.from), 8 - ROW (m.from), 'a' + COL (m.dest), 8 - ROW (m.dest), depth, decimal_score, t, knps, count_cap_calls, count_quies_calls, count_MakeMove, ratio_Qsearc_Capcalls);
 
+    computer_move_from_x = COL(m.from);
+    computer_move_from_y = ROW(m.from);
+    computer_move_to_x = COL(m.dest);
+    computer_move_to_y = ROW(m.dest);
+
     return m;
 }
 
@@ -1543,6 +1553,13 @@ int chess_piece_at(int row, int col) {
     }
     
     return figure;
+}
+
+void chess_last_move(int* from_col, int* from_row, int* to_col, int* to_row) {
+    *from_col = computer_move_from_x;
+    *from_row = computer_move_from_y;
+    *to_col = computer_move_to_x;
+    *to_row = computer_move_to_y;
 }
 
 void chess_initialize() {
