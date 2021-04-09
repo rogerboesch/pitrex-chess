@@ -11,6 +11,7 @@ TODO:
 DONE:
 - **Improve drawings (Change lines to linestrips)**
 - **Put chess engine in 2nd thread to avoid screen waiting times**
+- **XCode playgorund*
 
 Future plans:
 - Change of side in game

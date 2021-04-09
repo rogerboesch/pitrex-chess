@@ -93,8 +93,10 @@ void platform_frame(void) {
 // MARK: - Input handling
 
 void platform_input_wait(void) {
+#if PITREX
 	platform_wait = true;
 	platform_wait_count = 0;
+#endif
 }
 
 boolean platform_input_is_left(void) {
