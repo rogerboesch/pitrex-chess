@@ -1435,13 +1435,16 @@ MOVE computer_think(int depth) {
         decimal_score = -decimal_score;
     }
 
-    printf("Search result: move = %c%d%c%d; depth = %d, score = %.2f, time = %.2fs knps = %.2f\n- countCapCalls = %d\n- countQSearch = %d\n- moves made = %d\n- ratio_Qsearc_Capcalls = %.2f\n",
-           'a' + COL (m.from), 8 - ROW (m.from), 'a' + COL (m.dest), 8 - ROW (m.dest), depth, decimal_score, t, knps, count_cap_calls, count_quies_calls, count_MakeMove, ratio_Qsearc_Capcalls);
+    //printf("Search result: move = %c%d%c%d; depth = %d, score = %.2f, time = %.2fs knps = %.2f\n- countCapCalls = %d\n- countQSearch = %d\n- moves made = %d\n- ratio_Qsearc_Capcalls = %.2f\n",
+    //       'a' + COL (m.from), 8 - ROW (m.from), 'a' + COL (m.dest), 8 - ROW (m.dest), depth, decimal_score, t, knps, count_cap_calls, count_quies_calls, count_MakeMove, ratio_Qsearc_Capcalls);
 
     computer_move_from_x = COL(m.from);
     computer_move_from_y = ROW(m.from);
     computer_move_to_x = COL(m.dest);
     computer_move_to_y = ROW(m.dest);
+
+    printf("Search: depth = %d, score = %.2f, time = %.2fs\n", depth, decimal_score, t);
+    printf("Moved from %d,%d to %d,%d\n", computer_move_from_x, computer_move_from_y, computer_move_to_x, computer_move_to_y);
 
     return m;
 }
