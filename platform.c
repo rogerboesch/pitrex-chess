@@ -150,8 +150,6 @@ boolean platform_input_is_down(void) {
 boolean platform_button_is_pressed(int number) {
 	if (platform_wait)
 		return false;
-
-    printf("button state: %d\n", currentButtonState);
     
     switch (number) {
         case 1:

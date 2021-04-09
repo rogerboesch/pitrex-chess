@@ -144,7 +144,7 @@ const int *pieces[8] = {castle, knight, bishop, queen, king, bishop, knight, cas
 const int *piece_type[6] = {pawn, knight, bishop, castle, queen, king};
 
 typedef enum _GAME_STATE {
-    GAME_INITIALIZE, GAME_START, COMPUTER_THINK, COMPUTER_MOVED, PLAYER_CHOOSE_FROM, PLAYER_CHOOSE_TO, PLAYER_MOVE, GAME_END
+    GAME_INITIALIZE, GAME_START, COMPUTER_THINK, COMPUTER_MOVED, PLAYER_CHOOSE_FROM, PLAYER_CHOOSE_TO, PLAYER_MOVE, PLAYER_ANIMATE, PLAYER_ANIMATE_END, GAME_END
 } GAME_STATE;
 
 // MARK: - Forwards
@@ -209,10 +209,7 @@ void draw_marker(int row, int col) {
     platform_draw_continous_points(&points[0], points_count,HIGHLIGHT_COLOR);
 }
 
-void draw_lines(const int *lines, int row, int col, int color) {
-    float x = LEFTMARGIN + col * HSPACING;
-    float y = TOPMARGIN + row * VSPACING;
-
+void draw_lines_xy(const int *lines, int x, int y, int color) {
     // Temporary solution
     int points[100];
     int points_count = 0;
@@ -243,10 +240,21 @@ void draw_lines(const int *lines, int row, int col, int color) {
     }
 }
 
+void draw_lines(const int *lines, int row, int col, int color) {
+    float x = LEFTMARGIN + col * HSPACING;
+    float y = TOPMARGIN + row * VSPACING;
+
+    draw_lines_xy(lines, x, y, color);
+}
+
 // MARK: - Board drawing
 
 void draw_piece(const int *piece, int row, int col, int color) {
     draw_lines((int *)piece+game_colour, row, col, color);
+}
+
+void draw_piece_xy(const int *piece, int x, int y, int color) {
+    draw_lines_xy((int *)piece+game_colour, x, y, color);
 }
 
 void draw_board_piece(int row, int col) {
@@ -393,6 +401,59 @@ void build_from_to_position() {
     sprintf(temp, "YOUR MOVE %c%d TO %c%d", h1, 8-game_from_y, h2, 8-game_from_y);
 }
 
+// MARK: - Animate figure
+
+int lerp(int a, int b, int time, int duration) {
+    int r = a+((b-a)*time/duration);
+    return r;
+}
+
+int counter = 0;
+#define ANIMATION_TIME 20
+
+void animate_piece() {
+    int index = game_board[game_from_y][game_from_x];
+    if (index == 0) {
+        // Empty board cell
+        return;
+    }
+    
+    game_colour = WHITE;
+    draw_color = DEFAULT_COLOR;
+    
+    if (index > 9) {
+        index -= BLACK_OFFSET;
+        game_colour = BLACK;
+        draw_color = HIGHLIGHT_COLOR;
+    }
+
+    int x1 = LEFTMARGIN + game_from_x * HSPACING;
+    int y1 = TOPMARGIN  + game_from_y * VSPACING;
+    int x2 = LEFTMARGIN + game_to_x * HSPACING;
+    int y2 = TOPMARGIN  + game_to_y * VSPACING;
+    
+    int x = x1;
+    int y = y1;
+    
+    if (x1 != x2) {
+        x = lerp(x1, x2, counter, ANIMATION_TIME);
+    }
+    
+    if (y1 != y2) {
+        y = lerp(y1, y2, counter, ANIMATION_TIME);
+        printf("Y LERP: %d (%d > %d)\n", y, y1, y2);
+    }
+    
+    draw_piece_xy(piece_type[index-1], x, y, draw_color);
+    
+    if (counter >= ANIMATION_TIME) {
+        game_state = PLAYER_ANIMATE_END;
+    }
+    else {
+        counter++;
+    }
+}
+
 // MARK: - Chess
 
 void* threadFunction(void* args) {
@@ -534,6 +595,14 @@ boolean game_frame(void) {
             break;
         case PLAYER_MOVE:
             user_move();
+            
+            counter = 0;
+            game_state = PLAYER_ANIMATE;
+            break;
+        case PLAYER_ANIMATE:
+            animate_piece();
+            break;
+        case PLAYER_ANIMATE_END:
             update_board();
 
             if (game_win()) {
@@ -542,6 +611,7 @@ boolean game_frame(void) {
             else {
                 computer_move();
             }
+
             break;
         case GAME_END:
             print_msg("GAME ENDED");
