@@ -10,7 +10,7 @@
 
 @end
 
-@interface FramebufferView : NSView {
+@interface PlaygroundView : NSView {
 }
 
 - (void)render:(unsigned char *)buffer;

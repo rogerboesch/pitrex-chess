@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		DBD9CCF62620283600B3C057 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CCF52620283600B3C057 /* AppDelegate.m */; };
 		DBD9CCFE2620283700B3C057 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CCFD2620283700B3C057 /* main.m */; };
-		DBD9CD0E26202A8D00B3C057 /* FramebufferView.m in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CD0D26202A8D00B3C057 /* FramebufferView.m */; };
+		DBD9CD0E26202A8D00B3C057 /* PlaygroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CD0D26202A8D00B3C057 /* PlaygroundView.m */; };
 		DBD9CD1926202EBE00B3C057 /* chess_engine.c in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CD1526202EBE00B3C057 /* chess_engine.c */; };
 		DBD9CD1A26202EBE00B3C057 /* platform.c in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CD1726202EBE00B3C057 /* platform.c */; };
 		DBD9CD1B26202EBE00B3C057 /* chess_main.c in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CD1826202EBE00B3C057 /* chess_main.c */; };
@@ -21,8 +21,8 @@
 		DBD9CCF52620283600B3C057 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		DBD9CCFC2620283700B3C057 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DBD9CCFD2620283700B3C057 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		DBD9CD0C26202A8D00B3C057 /* FramebufferView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FramebufferView.h; sourceTree = "<group>"; };
-		DBD9CD0D26202A8D00B3C057 /* FramebufferView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FramebufferView.m; sourceTree = "<group>"; };
+		DBD9CD0C26202A8D00B3C057 /* PlaygroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaygroundView.h; sourceTree = "<group>"; };
+		DBD9CD0D26202A8D00B3C057 /* PlaygroundView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlaygroundView.m; sourceTree = "<group>"; };
 		DBD9CD1526202EBE00B3C057 /* chess_engine.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = chess_engine.c; path = ../chess_engine.c; sourceTree = "<group>"; };
 		DBD9CD1626202EBE00B3C057 /* platform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = platform.h; path = ../platform.h; sourceTree = "<group>"; };
 		DBD9CD1726202EBE00B3C057 /* platform.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = platform.c; path = ../platform.c; sourceTree = "<group>"; };
@@ -62,8 +62,8 @@
 			children = (
 				DBD9CCF42620283600B3C057 /* AppDelegate.h */,
 				DBD9CCF52620283600B3C057 /* AppDelegate.m */,
-				DBD9CD0C26202A8D00B3C057 /* FramebufferView.h */,
-				DBD9CD0D26202A8D00B3C057 /* FramebufferView.m */,
+				DBD9CD0C26202A8D00B3C057 /* PlaygroundView.h */,
+				DBD9CD0D26202A8D00B3C057 /* PlaygroundView.m */,
 				DBD9CCFD2620283700B3C057 /* main.m */,
 				DBD9CCFC2620283700B3C057 /* Info.plist */,
 			);
@@ -149,7 +149,7 @@
 			files = (
 				DBD9CCFE2620283700B3C057 /* main.m in Sources */,
 				DBD9CD1A26202EBE00B3C057 /* platform.c in Sources */,
-				DBD9CD0E26202A8D00B3C057 /* FramebufferView.m in Sources */,
+				DBD9CD0E26202A8D00B3C057 /* PlaygroundView.m in Sources */,
 				DBD9CD1B26202EBE00B3C057 /* chess_main.c in Sources */,
 				DBD9CD1926202EBE00B3C057 /* chess_engine.c in Sources */,
 				DBD9CCF62620283600B3C057 /* AppDelegate.m in Sources */,
@@ -278,6 +278,11 @@
 				CODE_SIGN_ENTITLEMENTS = PitrexPlayground/PitrexPlayground.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					"PITREX_PLAYGROUND=1",
+				);
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -296,6 +301,7 @@
 				CODE_SIGN_ENTITLEMENTS = PitrexPlayground/PitrexPlayground.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = "PITREX_PLAYGROUND=1";
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

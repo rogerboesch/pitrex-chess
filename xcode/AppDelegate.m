@@ -6,7 +6,7 @@
 //
 
 #import "AppDelegate.h"
-#import "FramebufferView.h"
+#import "PlaygroundView.h"
 
 int chess_main(void);
 
@@ -14,7 +14,7 @@ int chess_main(void);
 
 @property (strong, nonatomic) NSWindow* window;
 @property (strong, nonatomic) NSMenu* menu;
-@property (strong, nonatomic) FramebufferView* view;
+@property (strong, nonatomic) PlaygroundView* view;
 
 @end
 
@@ -41,7 +41,7 @@ int chess_main(void);
     self.window.title = title;
     self.window.delegate = self;
 
-    self.view = [[FramebufferView alloc] initWithFrame:self.window.contentView.bounds];
+    self.view = [[PlaygroundView alloc] initWithFrame:self.window.contentView.bounds];
     [self.window.contentView addSubview:self.view];
 
     [self.window makeKeyAndOrderFront:nil];

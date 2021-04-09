@@ -6,11 +6,36 @@
 #include <stdlib.h>
 
 #ifdef PITREX
+// Pitrex includes
 
 #include <pitrex/pitrexio-gpio.h>
 #include <vectrex/vectrexInterface.h>
 
+#elif PITREX_PLAYGROUND
+// Pitrex calls forwarded to playground
+
+int currentButtonState;
+int currentJoy1X;
+int currentJoy1Y;
+
+int vectrexinit(char viaconfig);
+void v_setName(char *name);
+void v_init(void);
+void v_setRefresh(int hz);
+
+void v_WaitRecal(void);
+void v_readButtons(void);
+void v_readJoystick1Analog(void);
+
+void v_directMove32(int32_t x1, int32_t y1);
+void v_directDeltaDraw32(int32_t x1, int32_t y1, uint8_t color);
+
+void v_directDraw32(int x1, int y1, int x2, int y2, int color);
+void v_printString(int x, int y, char* str, int textSize, int color);
+int  v_printStringRaster(int8_t x, int8_t y, char* str, int8_t xSize, int8_t ySize, unsigned char delimiter);
+
 #else
+// Pitrex calls outputed to stdio
 
 #include <unistd.h>
 
