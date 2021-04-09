@@ -20,6 +20,28 @@ int chess_main(void);
 
 @implementation AppDelegate
 
+// MARK: - Playground helpers
+
++ (AppDelegate *)sharedDelegate {
+    return (AppDelegate *)NSApplication.sharedApplication.delegate;
+}
+
++ (void)setName:(char *)name {
+    NSString* title = [NSString stringWithUTF8String:name];
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [AppDelegate sharedDelegate].window.title = title;
+    });
+}
+
++ (void)renderPlayground:(NSImage *)image {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[AppDelegate sharedDelegate].view render:image];
+    });
+}
+
+// MARK: - Minimal UI
+
 - (void)createMiniMenu:(NSString *)title {
     self.menu = [[NSMenu alloc] initWithTitle:@"MainMenu"];
     NSApp.mainMenu = self.menu;

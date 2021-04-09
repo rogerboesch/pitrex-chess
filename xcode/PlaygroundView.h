@@ -13,6 +13,6 @@
 @interface PlaygroundView : NSView {
 }
 
-- (void)render:(unsigned char *)buffer;
+- (void)render:(NSImage *)image;
 
 @end

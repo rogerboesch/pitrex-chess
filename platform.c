@@ -149,6 +149,8 @@ boolean platform_button_is_pressed(int number) {
 	if (platform_wait)
 		return false;
 
+    printf("button state: %d\n", currentButtonState);
+    
     switch (number) {
         case 1:
             if ((currentButtonState&0x01) == (0x01))
@@ -186,26 +188,38 @@ void platform_raster_msg(char* msg, int x, int y, int size, int color) {
 }
 
 void platform_draw_line(int x1, int y1, int x2, int y2, int color) {
+#ifdef PITREX
 	int xx1 = MAX_DAC * x1 / 400 - DAC;
 	int yy1 = DAC - MAX_DAC * y1 / 400;
 	int xx2 = MAX_DAC * x2 / 400 - DAC;
 	int yy2 = DAC - MAX_DAC * y2 / 400;
 
 	v_directDraw32(xx1, yy1, xx2, yy2, color);
+#else
+    v_directDraw32(x1, y1, x2, y2, color);
+#endif
 }
 
 void platform_draw_lineby(int x1, int y1, int color) {
-	int xx1 = MAX_DAC * x1 / 400;
+#ifdef PITREX
+    int xx1 = MAX_DAC * x1 / 400;
 	int yy1 = MAX_DAC * y1 / 400;
 
 	v_directDeltaDraw32(xx1, yy1, color);
+#else
+    v_directDeltaDraw32(x1, y1, color);
+#endif
 }
 
-void platform_moveto(int x1, int y1) {	
-	int xx1 = MAX_DAC * x1 / 400 - DAC;
-	int yy1 = DAC - MAX_DAC * y1 / 400;
+void platform_moveto(int x1, int y1) {
+#ifdef PITREX
+    int xx1 = MAX_DAC * x1 / 400 - DAC;
+    int yy1 = DAC - MAX_DAC * y1 / 400;
 
-	v_directMove32(xx1, yy1);
+    v_directMove32(xx1, yy1);
+#else
+    v_directMove32(x1, y1);
+#endif
 }
 
 void platform_draw_points(int* points, int count, int color) {
