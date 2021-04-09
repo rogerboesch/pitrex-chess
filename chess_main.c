@@ -450,12 +450,12 @@ void animate_piece() {
     int y = y1;
     
     if (x1 != x2) {
-        x = lerp(x1, x2, animation_counter, ANIMATION_TIME);
+        x = lerp(x1, x2, animation_counter, animation_time);
     }
     
     if (y1 != y2) {
-        y = lerp(y1, y2, animation_counter, ANIMATION_TIME);
-        printf("Y LERP: %d (%d > %d)\n", y, y1, y2);
+        y = lerp(y1, y2, animation_counter, animation_time);
+        printf("Y LERP: %d (%d > %d) [%d > %d]\n", y, y1, y2, animation_counter, animation_time);
     }
     
     draw_piece_xy(piece_type[index-1], x, y, draw_color);
@@ -464,7 +464,7 @@ void animate_piece() {
 void animate_player() {
     animate_piece();
     
-    if (animation_counter >= ANIMATION_TIME) {
+    if (animation_counter >= animation_time) {
         game_state = PLAYER_ANIMATE_END;
     }
     else {
@@ -475,7 +475,7 @@ void animate_player() {
 void animate_computer() {
     animate_piece();
 
-    if (animation_counter >= ANIMATION_TIME) {
+    if (animation_counter >= animation_time) {
         game_state = COMPUTER_ANIMATE_END;
     }
     else {
