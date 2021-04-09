@@ -400,6 +400,8 @@ void* threadFunction(void* args) {
 	chess_computer_move();
 	game_state = COMPUTER_MOVED;
 	printf("End of thinking in thread\n");
+    
+    return 0;
 }
 
 void computer_move() {
@@ -549,7 +551,11 @@ boolean game_frame(void) {
     return true;
 }
 
+#ifdef PITREX
 int main() {
+#else
+int chess_main() {
+#endif
     platform_init("chess");
     
     game_start();

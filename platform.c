@@ -1,18 +1,17 @@
 
 #include "platform.h"
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 #ifdef PITREX
 
 #include <pitrex/pitrexio-gpio.h>
 #include <vectrex/vectrexInterface.h>
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
 #else
 
-#include <stdio.h>
 #include <unistd.h>
 
 int currentButtonState;
@@ -28,9 +27,12 @@ void v_WaitRecal() { printf("v_WaitRecal ------------------\n"); usleep(20*1000)
 void v_readButtons() { printf("v_readButtons\n"); }
 void v_readJoystick1Analog() { printf("v_readJoystick1Analog\n"); }
 
-void v_directDraw32(int x1, int y1, int x2, int y2, int color) { printf("v_directDraw32: %d,%d,%d,%d (%d)\n", x1, y1, x2, y2, color); }
+void v_directMove32(int32_t x1, int32_t y1)  { printf("v_directMove32: %d,%d\n", x1, y1); }
+void v_directDeltaDraw32(int32_t x1, int32_t y1, uint8_t color) { printf("v_directDeltaDraw32: %d,%d (%d)\n", x1, y1, color); }
 
-void v_printString(int x, int y, char* str, int textSize, int brightness) { printf("v_printString: %s\n", str)
+void v_directDraw32(int x1, int y1, int x2, int y2, int color) { printf("v_directDraw32: %d,%d,%d,%d (%d)\n", x1, y1, x2, y2, color); }
+void v_printString(int x, int y, char* str, int textSize, int color) { printf("v_printString: %s\n", str); }
+int  v_printStringRaster(int8_t x, int8_t y, char* str, int8_t xSize, int8_t ySize, unsigned char delimiter) { printf("v_printStringRaster: %s\n", str); return 0; }
 
 #endif
 
@@ -154,7 +156,7 @@ void platform_msg(char* msg, int x, int y, int size, int color) {
 }
 
 void platform_raster_msg(char* msg, int x, int y, int size, int color) {
-	int tlength = strlen(msg)-1;
+	int tlength = (int)strlen(msg)-1;
 	v_printStringRaster(tlength, 0, msg, x, y, '\0');
 }
 

@@ -6,6 +6,10 @@
 chess
 *.swp
 
+### XCode ###
+.DS_Store
+xcuserdata/
+
 ### C++ ###
 # Prerequisites
 *.d
