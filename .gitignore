@@ -6,9 +6,14 @@
 chess
 *.swp
 
-### XCode ###
+### Xcode Patch ###
 .DS_Store
 xcuserdata/
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcworkspace/contents.xcworkspacedata
+**/xcshareddata/WorkspaceSettings.xcsettings
 
 ### C++ ###
 # Prerequisites

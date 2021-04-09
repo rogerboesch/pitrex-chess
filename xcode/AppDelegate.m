@@ -8,6 +8,8 @@
 #import "AppDelegate.h"
 #import "FramebufferView.h"
 
+int chess_main(void);
+
 @interface AppDelegate ()
 
 @property (strong, nonatomic) NSWindow* window;
@@ -50,8 +52,13 @@
     [self createMiniMenu:title];
 }
 
+- (void)start {
+    chess_main();
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     [self createUI:@"Playground"];
+    [self performSelectorInBackground:@selector(start) withObject:NULL];
 }
 
 @end
