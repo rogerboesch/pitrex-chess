@@ -279,7 +279,12 @@ void draw_board_piece(int row, int col) {
 void draw_board() {
     for (int row = 0; row < 8; row++) {
         for (int col = 0; col < 8; col++) {
-            draw_board_piece(row, col);
+            if ((game_state == PLAYER_ANIMATE || game_state == PLAYER_ANIMATE_END) && game_from_x == col && game_from_y == row) {
+                ; // Dont render
+            }
+            else {
+                draw_board_piece(row, col);
+            }
         }
     }
 }
