@@ -261,6 +261,8 @@ void platform_draw_continous_points(int* points, int count, int color) {
     int index = 2;
     int* offset = points;
 
+    //printf("Draw points: %d (%d)\n", count, color);
+    
     if (count < 2)
         return;
 
@@ -277,16 +279,21 @@ void platform_draw_continous_points(int* points, int count, int color) {
         return;
     }
 
-//    platform_moveto(x1, y1);
-    platform_draw_line(x1, y1, x1, y1, color);
-
     while (index < count) {
-        x1 = *offset;
+        int x2 = *offset;
+        x2 += x1;
         offset++;
-        y1 = *offset;
+        
+        int y2 = *offset;
+        y2 += y1;
         offset++;
 
-        platform_draw_lineby(x1, y1, color);
+        // printf(" > %d,%d,%d,%d\n", x1, y1, x2, y2);
+
+        platform_draw_line(x1, y1, x2, y2, color);
+        
+        x1 = x2;
+        y1 = y2;
         
         index += 2;
     }
