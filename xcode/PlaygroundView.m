@@ -15,6 +15,7 @@ void fb_clear(void);
 void fb_render(void);
 void fb_set_pixel(int x, int y, int color);
 void fb_draw_line(int x1, int y1, int x2, int y2, int color, int invert);
+void fb_draw_line_set_cursor(int x1, int y1, int x2, int y2, int color, int invert);
 void fb_moveto(int x, int y);
 void fb_lineby(int x, int y, int color, int invert);
 void fb_draw_string(int x, int y, char* str, int size, int color);
@@ -26,7 +27,7 @@ void v_init(void) { fb_init(); }
 void v_WaitRecal(void) { fb_render(); usleep(20*1000); fb_clear(); }
 void v_directMove32(int32_t x, int32_t y) { fb_moveto(x, y); }
 void v_directDeltaDraw32(int32_t x, int32_t y, uint8_t color) { fb_lineby(x, y, color, 1); }
-void v_directDraw32(int x1, int y1, int x2, int y2, int color) { fb_draw_line(x1, y1, x2, y2, color, 1); }
+void v_directDraw32(int x1, int y1, int x2, int y2, int color) { fb_draw_line_set_cursor(x1, y1, x2, y2, color, 1); }
 void v_printString(int x, int y, char* str, int textSize, int color) { fb_draw_string(x, y, str, textSize, color); }
 
 // Unimplemenyed calls (dummies)
@@ -268,9 +269,11 @@ void fb_draw_line(int x1, int y1, int x2, int y2, int color, int invert) {
         x += xInc;
         y += yInc;
     }
-    
-    last_x = x2;
-    last_y = y2;
+}
+
+void fb_draw_line_set_cursor(int x1, int y1, int x2, int y2, int color, int invert) {
+    fb_draw_line(x1, y1, x2, y2, color, invert);
+    fb_moveto(x2, y2);
 }
 
 void fb_moveto(int x, int y) {

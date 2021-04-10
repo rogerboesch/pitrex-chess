@@ -81,30 +81,30 @@ void platform_frame(void) {
     v_readButtons();
     v_readJoystick1Analog();
 
-	if (platform_wait) {
-		platform_wait_count++;
+    if (platform_wait) {
+        platform_wait_count++;
 
-		if (platform_wait_count >= DEFAULT_INPUT_WAIT_TIME) {
-			platform_wait = false;
-		}
-	}
+        if (platform_wait_count >= DEFAULT_INPUT_WAIT_TIME) {
+            platform_wait = false;
+        }
+    }
 }
 
 // MARK: - Input handling
 
 void platform_input_wait(void) {
 #if PITREX
-	platform_wait = true;
-	platform_wait_count = 0;
+    platform_wait = true;
+    platform_wait_count = 0;
 #endif
 }
 
 boolean platform_input_is_left(void) {
-	if (platform_wait)
-		return false;
-		
+    if (platform_wait)
+        return false;
+        
     if (currentJoy1X < -50) {
-		// printf("Left\n");
+        // printf("Left\n");
         return true;
     }
     
@@ -112,23 +112,23 @@ boolean platform_input_is_left(void) {
 }
 
 boolean platform_input_is_right(void) {
-	if (platform_wait)
-		return false;
+    if (platform_wait)
+        return false;
 
     if (currentJoy1X > 50) {
-    	// printf("Right\n");
-    	return true;
+        // printf("Right\n");
+        return true;
     }
     
     return false;
 }
 
 boolean platform_input_is_up(void) {
-	if (platform_wait)
-		return false;
+    if (platform_wait)
+        return false;
 
     if (currentJoy1Y > 50) {
-		// printf("Up\n");
+        // printf("Up\n");
         return true;
     }
     
@@ -136,11 +136,11 @@ boolean platform_input_is_up(void) {
 }
 
 boolean platform_input_is_down(void) {
-	if (platform_wait)
-		return false;
+    if (platform_wait)
+        return false;
 
     if (currentJoy1Y < -50) {
-		// printf("Down\n");
+        // printf("Down\n");
         return true;
     }
     
@@ -148,8 +148,8 @@ boolean platform_input_is_down(void) {
 }
 
 boolean platform_button_is_pressed(int number) {
-	if (platform_wait)
-		return false;
+    if (platform_wait)
+        return false;
     
     switch (number) {
         case 1:
@@ -179,22 +179,22 @@ boolean platform_button_is_pressed(int number) {
 // MARK: - Drawing
 
 void platform_msg(char* msg, int x, int y, int size, int color) {
-	v_printString(x, y, msg, size, color);
+    v_printString(x, y, msg, size, color);
 }
 
 void platform_raster_msg(char* msg, int x, int y, int size, int color) {
-	int tlength = (int)strlen(msg)-1;
-	v_printStringRaster(tlength, 0, msg, x, y, '\0');
+    int tlength = (int)strlen(msg)-1;
+    v_printStringRaster(tlength, 0, msg, x, y, '\0');
 }
 
 void platform_draw_line(int x1, int y1, int x2, int y2, int color) {
 #ifdef PITREX
-	int xx1 = MAX_DAC * x1 / 400 - DAC;
-	int yy1 = DAC - MAX_DAC * y1 / 400;
-	int xx2 = MAX_DAC * x2 / 400 - DAC;
-	int yy2 = DAC - MAX_DAC * y2 / 400;
+    int xx1 = MAX_DAC * x1 / 400 - DAC;
+    int yy1 = DAC - MAX_DAC * y1 / 400;
+    int xx2 = MAX_DAC * x2 / 400 - DAC;
+    int yy2 = DAC - MAX_DAC * y2 / 400;
 
-	v_directDraw32(xx1, yy1, xx2, yy2, color);
+    v_directDraw32(xx1, yy1, xx2, yy2, color);
 #else
     v_directDraw32(x1, y1, x2, y2, color);
 #endif
@@ -203,9 +203,9 @@ void platform_draw_line(int x1, int y1, int x2, int y2, int color) {
 void platform_draw_lineby(int x1, int y1, int color) {
 #ifdef PITREX
     int xx1 = MAX_DAC * x1 / 400;
-	int yy1 = MAX_DAC * y1 / 400;
+    int yy1 = MAX_DAC * y1 / 400;
 
-	v_directDeltaDraw32(xx1, yy1, color);
+    v_directDeltaDraw32(xx1, yy1, color);
 #else
     v_directDeltaDraw32(x1, y1, color);
 #endif
@@ -225,7 +225,7 @@ void platform_moveto(int x1, int y1) {
 void platform_draw_points(int* points, int count, int color) {
     int index = 2;
     int* offset = points;
-	
+    
     if (count < 2)
         return;
 
@@ -277,6 +277,7 @@ void platform_draw_continous_points(int* points, int count, int color) {
         return;
     }
 
+//    platform_moveto(x1, y1);
     platform_draw_line(x1, y1, x1, y1, color);
 
     while (index < count) {
