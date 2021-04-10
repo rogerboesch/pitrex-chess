@@ -1571,7 +1571,7 @@ void chess_initialize() {
     side = WHITE;
     computer_side = WHITE;
 
-    max_depth = 4;
+    max_depth = 3;
     hdp = 0;
     
     print_board();

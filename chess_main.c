@@ -16,8 +16,8 @@ void chess_initialize(void);
 
 #define SCALE 2
 #define HSPACING SCALE*20
-#define VSPACING SCALE*24
-#define TOPMARGIN 60
+#define VSPACING SCALE*28
+#define TOPMARGIN 35
 #define LEFTMARGIN 50
 
 #define WHITE 3
@@ -171,8 +171,8 @@ int animation_time = 0;
 // MARK: - drawing helpers
 
 void draw_rect(int row, int col) {
-    float x = LEFTMARGIN + col * HSPACING - 10;
-    float y = TOPMARGIN + row * VSPACING + 5;
+    float x = LEFTMARGIN + col * HSPACING - 12;
+    float y = TOPMARGIN + row * VSPACING - 8;
 
     // Temporary solution
     int points[5*2];
@@ -197,8 +197,8 @@ void draw_rect(int row, int col) {
 }
 
 void draw_marker(int row, int col) {
-    float x = LEFTMARGIN + col * HSPACING - 10;
-    float y = TOPMARGIN + row * VSPACING + 5;
+    float x = LEFTMARGIN + col * HSPACING - 12;
+    float y = TOPMARGIN + row * VSPACING - 8;
 
     // Temporary solution
     int points[4*2];
@@ -308,13 +308,13 @@ void update_board() {
 // MARK: - Game state helpers
 
 void choose_from_move() {
-    if (platform_input_is_up()) {
+    if (platform_input_is_down()) {
         if (game_from_y > 0) {
             game_from_y--;
             platform_input_wait();
         }
     }
-    if (platform_input_is_down()) {
+    if (platform_input_is_up()) {
         if (game_from_y < 7) {
             game_from_y++;
             platform_input_wait();
@@ -343,13 +343,13 @@ void choose_from_move() {
 }
 
 void choose_to_move() {
-    if (platform_input_is_up()) {
+    if (platform_input_is_down()) {
         if (game_to_y > 0) {
             game_to_y--;
             platform_input_wait();
         }
     }
-    if (platform_input_is_down()) {
+    if (platform_input_is_up()) {
         if (game_to_y < 8) {
             game_to_y++;
             platform_input_wait();
@@ -455,7 +455,6 @@ void animate_piece() {
     
     if (y1 != y2) {
         y = lerp(y1, y2, animation_counter, animation_time);
-        printf("Y LERP: %d (%d > %d) [%d > %d]\n", y, y1, y2, animation_counter, animation_time);
     }
     
     draw_piece_xy(piece_type[index-1], x, y, draw_color);
@@ -554,11 +553,11 @@ void init_board() {
 // MARK: - User message
 
 void print_info_top(char* msg) {
-    platform_msg(msg, -100, 120, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+    platform_msg(msg, -100, 128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
 }
 
 void print_msg(char* msg) {
-    platform_msg(msg, -80, 0, DEFAULT_TEXT_SIZE, DEFAULT_COLOR);
+    platform_msg(msg, -100, 128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
 }
 
 // MARK: - Game loop
