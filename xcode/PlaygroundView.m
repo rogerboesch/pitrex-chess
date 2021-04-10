@@ -26,6 +26,7 @@ void v_init(void) { fb_init(); }
 void v_WaitRecal(void) { fb_render(); usleep(20*1000); fb_clear(); }
 void v_directMove32(int32_t x, int32_t y) { fb_moveto(x, y); }
 void v_directDeltaDraw32(int32_t x, int32_t y, uint8_t color) { fb_lineby(x, y, color, 1); }
+void v_directDraw32(int x1, int y1, int x2, int y2, int color) { fb_draw_line(x1, y1, x2, y2, color, 1); }
 void v_printString(int x, int y, char* str, int textSize, int color) { fb_draw_string(x, y, str, textSize, color); }
 
 // Unimplemenyed calls (dummies)
@@ -33,8 +34,6 @@ int vectrexinit(char viaconfig) { return 0; }
 void v_setRefresh(int hz) {}
 void v_readButtons(void) {}
 void v_readJoystick1Analog(void) {}
-
-void v_directDraw32(int x1, int y1, int x2, int y2, int color) {}
 
 int  v_printStringRaster(int8_t x, int8_t y, char* str, int8_t xSize, int8_t ySize, unsigned char delimiter) { return 0; }
 
@@ -53,7 +52,7 @@ int  v_printStringRaster(int8_t x, int8_t y, char* str, int8_t xSize, int8_t ySi
 #pragma mark - Render
 
 - (void)render:(NSImage *)image {
-	self.renderImageView.image = image;
+    self.renderImageView.image = image;
 }
 
 #pragma mark - UI events
@@ -149,20 +148,20 @@ int  v_printStringRaster(int8_t x, int8_t y, char* str, int8_t xSize, int8_t ySi
 #pragma mark - Initialisation
 
 - (id)initWithFrame:(NSRect)frame {
-	self = [super initWithFrame:frame];
+    self = [super initWithFrame:frame];
     
-	self.wantsLayer = true;
-	self.layer.backgroundColor = [NSColor lightGrayColor].CGColor;
+    self.wantsLayer = true;
+    self.layer.backgroundColor = [NSColor lightGrayColor].CGColor;
 
-	self.renderImageView = [[NSImageView alloc] initWithFrame:frame];
-	self.renderImageView.imageScaling = NSImageScaleProportionallyUpOrDown;
-	self.renderImageView.imageAlignment = NSImageAlignCenter;
-	[self addSubview:self.renderImageView];
+    self.renderImageView = [[NSImageView alloc] initWithFrame:frame];
+    self.renderImageView.imageScaling = NSImageScaleProportionallyUpOrDown;
+    self.renderImageView.imageAlignment = NSImageAlignCenter;
+    [self addSubview:self.renderImageView];
 
-	self.renderImageView.wantsLayer = true;
-	self.renderImageView.layer.backgroundColor = [NSColor blackColor].CGColor;
+    self.renderImageView.wantsLayer = true;
+    self.renderImageView.layer.backgroundColor = [NSColor blackColor].CGColor;
 
-	return self;
+    return self;
 }
 
 @end
@@ -269,6 +268,9 @@ void fb_draw_line(int x1, int y1, int x2, int y2, int color, int invert) {
         x += xInc;
         y += yInc;
     }
+    
+    last_x = x2;
+    last_y = y2;
 }
 
 void fb_moveto(int x, int y) {

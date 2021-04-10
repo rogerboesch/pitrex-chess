@@ -273,11 +273,11 @@ void platform_draw_continous_points(int* points, int count, int color) {
     offset++;
 
     if (count == 2) {
-		platform_moveto(x1, y1);
+        platform_draw_line(x1, y1, x1, y1, color);
         return;
     }
 
-	platform_moveto(x1, y1);
+    platform_draw_line(x1, y1, x1, y1, color);
 
     while (index < count) {
         x1 = *offset;
