@@ -3,6 +3,7 @@
 This is an early stage and "brute force" port of chess to the PiTrex. 
 Next steps are:
 
+- Visual feedback of wrong moves [04-11-21]
 - UI shows now last move of player AND computer [04-11-21]
 - Animated movements of the chess figures [04-09-21]
 - Improve drawings [04-09-21]
@@ -13,11 +14,10 @@ Next steps are:
 TODO:
 
 UI:
-- Visual feedback of wrong moves
 - Visual feedback of check
 - Visual feedback of check mate
 - Different optimisations
-- Using PiTrex winwo system
+- Using PiTrex window system
 
 Chess:
 - Change of side in game
