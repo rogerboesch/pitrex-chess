@@ -155,7 +155,7 @@ typedef enum _GAME_STATE {
 // MARK: - Forwards
 
 void update_board(void);
-void build_last_move_position(void);
+void build_last_user_position(void);
 
 // MARK: - Game vars
 
@@ -318,28 +318,28 @@ void choose_from_move() {
         if (game_from_y > 0) {
             game_from_y--;
             platform_input_wait();
-            build_last_move_position();
+            build_last_user_position();
         }
     }
     if (platform_input_is_up()) {
         if (game_from_y < 7) {
             game_from_y++;
             platform_input_wait();
-            build_last_move_position();
+            build_last_user_position();
         }
     }
     if (platform_input_is_left()) {
         if (game_from_x > 0) {
             game_from_x--;
             platform_input_wait();
-            build_last_move_position();
+            build_last_user_position();
         }
     }
     if (platform_input_is_right()) {
         if (game_from_x < 7) {
             game_from_x++;
             platform_input_wait();
-            build_last_move_position();
+            build_last_user_position();
         }
     }
 
@@ -349,7 +349,7 @@ void choose_from_move() {
 
         game_state = PLAYER_CHOOSE_TO;
         platform_input_wait();
-        build_last_move_position();
+        build_last_user_position();
     }
 }
 
@@ -358,30 +358,35 @@ void choose_to_move() {
         if (game_to_y > 0) {
             game_to_y--;
             platform_input_wait();
+            build_last_user_position();
         }
     }
     if (platform_input_is_up()) {
         if (game_to_y < 8) {
             game_to_y++;
             platform_input_wait();
+            build_last_user_position();
         }
     }
     if (platform_input_is_left()) {
         if (game_to_x > 0) {
             game_to_x--;
             platform_input_wait();
+            build_last_user_position();
         }
     }
     if (platform_input_is_right()) {
         if (game_to_x < 8) {
             game_to_x++;
             platform_input_wait();
+            build_last_user_position();
         }
     }
     
     if (platform_button_is_pressed(BUTTON_FOUR)) {
         game_state = PLAYER_MOVE;
         platform_input_wait();
+        build_last_user_position();
     }
 }
 
@@ -410,17 +415,19 @@ void wait_for_begin() {
 
 // MARK: - User message
 
-void build_last_move_position() {
+void build_last_user_position() {
+    sprintf(player_info, "");
+
     if (game_state == PLAYER_CHOOSE_FROM) {
         char h1 = HORIZ[game_from_x];
 
-        sprintf(player_move_str, "P %c%d TO ", h1, 7-game_from_y);
+        sprintf(player_move_str, "P %c%d TO ", h1, 8-game_from_y);
     }
     else {
         char h1 = HORIZ[game_from_x];
         char h2 = HORIZ[game_to_x];
 
-        sprintf(player_move_str, "P %c%d TO %c%d", h1, 7-game_from_x, h2, 7-game_to_y);
+        sprintf(player_move_str, "P %c%d TO %c%d", h1, 8-game_from_x, h2, 8-game_to_y);
     }
 }
 
@@ -431,7 +438,7 @@ void build_last_computer_position() {
     sprintf(comp_move_str, "C %c%d TO %c%d", h1, 8-game_comp_from_y, h2, 8-game_comp_to_y);
 }
 
-void print_info_top() {
+void display_computer_info() {
     platform_msg(comp_move_str, 50, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
     
     if (strlen(comp_info) > 0) {
@@ -439,7 +446,7 @@ void print_info_top() {
     }
 }
 
-void print_info_bottom() {
+void display_user_info() {
     platform_msg(player_move_str, -100, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
     
     if (strlen(player_info) > 0) {
@@ -447,7 +454,7 @@ void print_info_bottom() {
     }
 }
 
-void print_msg(char* msg) {
+void display_msg(char* msg) {
     platform_msg(msg, -100, 0, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
 }
 
@@ -551,11 +558,12 @@ void computer_move() {
     }
 }
 
-void user_move() {
+boolean user_move() {
     int from = game_from_y*8+game_from_x;
     int to = game_to_y*8+game_to_x;
 
-    chess_user_move(from, to);
+    int result = chess_user_move(from, to);
+    return result == 0 ? true : false;
 }
 
 void init_board() {
@@ -615,7 +623,7 @@ boolean game_frame(void) {
     switch (game_state) {
         case GAME_INITIALIZE:
             wait_for_begin();
-            print_msg("PRESS BUTTON TO START");
+            display_msg("PRESS BUTTON TO START");
             break;
         case GAME_START:
             computer_move();
@@ -657,11 +665,18 @@ boolean game_frame(void) {
             draw_to_move();
             break;
         case PLAYER_MOVE:
-            user_move();
-            
-            animation_counter = 0;
-            animation_time = distance() * ANIMATION_TIME;
-            game_state = PLAYER_ANIMATE;
+            if (user_move()) {
+                animation_counter = 0;
+                animation_time = distance() * ANIMATION_TIME;
+                game_state = PLAYER_ANIMATE;
+            }
+            else {
+                sprintf(player_info, "ILLEGAL MOVE");
+                
+                game_from_x = 0; game_from_y = 0;
+                game_to_x = 0; game_to_y = 0;
+                game_state = PLAYER_CHOOSE_FROM;
+            }
             break;
         case PLAYER_ANIMATE:
             animate_player();
@@ -678,13 +693,13 @@ boolean game_frame(void) {
 
             break;
         case GAME_END:
-            print_msg("GAME ENDED");
+            display_msg("GAME ENDED");
             break;
     }
 
     // Render UI
-    print_info_top();
-    print_info_bottom();
+    display_computer_info();
+    display_user_info();
     
     return true;
 }

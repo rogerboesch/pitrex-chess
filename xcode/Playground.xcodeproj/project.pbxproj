@@ -13,6 +13,7 @@
 		DBD9CD1926202EBE00B3C057 /* chess_engine.c in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CD1526202EBE00B3C057 /* chess_engine.c */; };
 		DBD9CD1A26202EBE00B3C057 /* platform.c in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CD1726202EBE00B3C057 /* platform.c */; };
 		DBD9CD1B26202EBE00B3C057 /* chess_main.c in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CD1826202EBE00B3C057 /* chess_main.c */; };
+		DBD9CD492623128A00B3C057 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = DBD9CD482623128A00B3C057 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 		DBD9CD1626202EBE00B3C057 /* platform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = platform.h; path = ../platform.h; sourceTree = "<group>"; };
 		DBD9CD1726202EBE00B3C057 /* platform.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = platform.c; path = ../platform.c; sourceTree = "<group>"; };
 		DBD9CD1826202EBE00B3C057 /* chess_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = chess_main.c; path = ../chess_main.c; sourceTree = "<group>"; };
+		DBD9CD482623128A00B3C057 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,6 +45,7 @@
 		DBD9CCE82620283600B3C057 = {
 			isa = PBXGroup;
 			children = (
+				DBD9CD482623128A00B3C057 /* README.md */,
 				DBD9CD1426202EA400B3C057 /* Chess */,
 				DBD9CCF32620283600B3C057 /* Playground */,
 				DBD9CCF22620283600B3C057 /* Products */,
@@ -137,6 +140,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DBD9CD492623128A00B3C057 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
