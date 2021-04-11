@@ -2,6 +2,7 @@
 #include "platform.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <pthread.h>
 
 // MARK: -  Chess engine calls
@@ -23,6 +24,7 @@ void chess_initialize(void);
 #define WHITE 3
 #define BLACK 0
 #define BLACK_OFFSET 10
+#define HORIZ "ABCDEFGH"
 
 const int pawn[] = {
     -1,0*SCALE,-10*SCALE,
@@ -153,18 +155,22 @@ typedef enum _GAME_STATE {
 // MARK: - Forwards
 
 void update_board(void);
+void build_last_move_position(void);
 
 // MARK: - Game vars
 
 GAME_STATE game_state;
 int game_colour;
 int game_board[8][8] = {};
-int game_from_x, game_from_y;
-int game_to_x, game_to_y;
+int game_from_x, game_from_y, game_to_x, game_to_y;
+int game_comp_from_x, game_comp_from_y, game_comp_to_x, game_comp_to_y;
 int draw_color = DEFAULT_COLOR;
 
 #define ANIMATION_TIME 5
-char temp[256];
+char player_move_str[256];
+char player_info[256];
+char comp_move_str[256];
+char comp_info[256];
 int animation_counter = 0;
 int animation_time = 0;
 
@@ -312,24 +318,28 @@ void choose_from_move() {
         if (game_from_y > 0) {
             game_from_y--;
             platform_input_wait();
+            build_last_move_position();
         }
     }
     if (platform_input_is_up()) {
         if (game_from_y < 7) {
             game_from_y++;
             platform_input_wait();
+            build_last_move_position();
         }
     }
     if (platform_input_is_left()) {
         if (game_from_x > 0) {
             game_from_x--;
             platform_input_wait();
+            build_last_move_position();
         }
     }
     if (platform_input_is_right()) {
         if (game_from_x < 7) {
             game_from_x++;
             platform_input_wait();
+            build_last_move_position();
         }
     }
 
@@ -339,6 +349,7 @@ void choose_from_move() {
 
         game_state = PLAYER_CHOOSE_TO;
         platform_input_wait();
+        build_last_move_position();
     }
 }
 
@@ -393,24 +404,25 @@ void wait_for_begin() {
     }
 }
 
-void build_from_position() {
-	#define HORIZ "ABCDEFGH"
-    char h = HORIZ[game_from_x];
+void build_last_move_position() {
+    if (game_state == PLAYER_CHOOSE_FROM) {
+        char h1 = HORIZ[game_from_x];
 
-    sprintf(temp, "FROM %c%d TO", h, 8-game_from_y);
+        sprintf(player_move_str, "%c%d TO ", h1, 7-game_from_y);
+    }
+    else {
+        char h1 = HORIZ[game_from_x];
+        char h2 = HORIZ[game_to_x];
+
+        sprintf(player_move_str, "%c%d TO %c%d", h1, 7-game_from_x, h2, 7-game_to_y);
+    }
 }
 
-void build_from_to_position() {
-	if (game_from_x == 0 && game_from_y == 0) {
-		sprintf(temp, "");
-		return;
-	}
-	
-	#define HORIZ "ABCDEFGH"
-    char h1 = HORIZ[game_from_x];
-    char h2 = HORIZ[game_to_x];
+void build_last_computer_position() {
+    char h1 = HORIZ[game_comp_from_x];
+    char h2 = HORIZ[game_comp_to_x];
 
-    sprintf(temp, "YOUR MOVE %c%d TO %c%d", h1, 8-game_from_y, h2, 8-game_from_y);
+    sprintf(comp_move_str, "%c%d TO %c%d", h1, 8-game_comp_from_y, h2, 8-game_comp_to_y);
 }
 
 // MARK: - Animate figure
@@ -489,7 +501,7 @@ void* threadFunction(void* args) {
 	chess_computer_move();
 	printf("End of thinking in thread\n");
 
-    chess_last_move(&game_from_x, &game_from_y, &game_to_x, &game_to_y);
+    chess_last_move(&game_comp_from_x, &game_comp_from_y, &game_comp_to_x, &game_comp_to_y);
     
     game_state = COMPUTER_MOVED;
 
@@ -499,13 +511,14 @@ void* threadFunction(void* args) {
 void computer_move() {
 	pthread_t id;
     int ret;
-
-    game_state = COMPUTER_THINK;
-
+    
     // creating thread
     ret = pthread_create(&id, NULL, &threadFunction,NULL);
     if (ret == 0) {
     	printf("Thinking thread created successfully.\n");
+
+        game_state = COMPUTER_THINK;
+        sprintf(comp_info, "THINKING");
     }
     else {
         printf("Thread not created.\n");
@@ -552,8 +565,20 @@ void init_board() {
 
 // MARK: - User message
 
-void print_info_top(char* msg) {
-    platform_msg(msg, -100, 128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+void print_info_top() {
+    platform_msg(comp_move_str, -100, 128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+    
+    if (strlen(comp_info) > 0) {
+        platform_msg(comp_info, 100, 128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+    }
+}
+
+void print_info_bottom() {
+    platform_msg(player_move_str, -100, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+    
+    if (strlen(player_info) > 0) {
+        platform_msg(player_info, 100, 128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+    }
 }
 
 void print_msg(char* msg) {
@@ -592,12 +617,10 @@ boolean game_frame(void) {
             computer_move();
             break;
         case COMPUTER_THINK:
-        	build_from_to_position();
-            print_info_top(temp);
-
-        	print_msg("THINKING...");
         	break;
         case COMPUTER_MOVED:
+            sprintf(comp_info, "");
+            build_last_computer_position();
             animation_counter = 0;
             animation_time = distance() * ANIMATION_TIME;
             game_state = COMPUTER_ANIMATE;
@@ -619,15 +642,10 @@ boolean game_frame(void) {
             }
             break;
         case PLAYER_CHOOSE_FROM:
-            print_info_top("YOUR MOVE");
-            
             choose_from_move();
             draw_from_move();
             break;
         case PLAYER_CHOOSE_TO:
-        	build_from_position();
-            print_info_top(temp);
-
             choose_to_move();
             draw_choosen_from_move();
             draw_to_move();
@@ -657,6 +675,10 @@ boolean game_frame(void) {
             print_msg("GAME ENDED");
             break;
     }
+
+    // Render UI
+    print_info_top();
+    print_info_bottom();
     
     return true;
 }
