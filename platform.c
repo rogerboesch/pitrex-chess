@@ -10,6 +10,7 @@
 
 #include <pitrex/pitrexio-gpio.h>
 #include <vectrex/vectrexInterface.h>
+#include "window.h"
 
 #elif PITREX_PLAYGROUND
 // Pitrex calls forwarded to playground
@@ -64,8 +65,9 @@ int  v_printStringRaster(int8_t x, int8_t y, char* str, int8_t xSize, int8_t ySi
 #define MAX_DAC 32768
 #define DAC MAX_DAC/2
 
-boolean platform_wait = false;
-int platform_wait_count = 0;
+static boolean platform_wait = false;
+static int platform_wait_count = 0;
+static int platform_color = 0;
 
 // MARK: - Platform
 
@@ -73,7 +75,10 @@ void platform_init(char* name) {
     vectrexinit(1);
     v_setName(name);
     v_init();
+	usePipeline = 1;
     v_setRefresh(60);
+	v_setBrightness(DEFAULT_COLOR);
+    v_window(0, 0, 360, 360, NO_CLIP);
 }
 
 void platform_frame(void) {
@@ -189,12 +194,13 @@ void platform_raster_msg(char* msg, int x, int y, int size, int color) {
 
 void platform_draw_line(int x1, int y1, int x2, int y2, int color) {
 #ifdef PITREX
-    int xx1 = MAX_DAC * x1 / 400 - DAC;
-    int yy1 = MAX_DAC * y1 / 400 - DAC;
-    int xx2 = MAX_DAC * x2 / 400 - DAC;
-    int yy2 = MAX_DAC * y2 / 400 - DAC;
+//    int xx1 = MAX_DAC * x1 / 400 - DAC;
+//    int yy1 = MAX_DAC * y1 / 400 - DAC;
+//    int xx2 = MAX_DAC * x2 / 400 - DAC;
+//    int yy2 = MAX_DAC * y2 / 400 - DAC;
 
-    v_directDraw32(xx1, yy1, xx2, yy2, color);
+//    v_directDraw32(xx1, yy1, xx2, yy2, color);	
+	v_line(x1, y1, x2, y2, color);
 #else
     v_directDraw32(x1, y1, x2, y2, color);
 #endif
