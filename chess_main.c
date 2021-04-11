@@ -177,8 +177,8 @@ int animation_time = 0;
 // MARK: - drawing helpers
 
 void draw_rect(int row, int col, int color) {
-    float x = LEFTMARGIN + col * HSPACING - 12;
-    float y = TOPMARGIN + row * VSPACING - 8;
+    int x = LEFTMARGIN + col * HSPACING - 12;
+    int y = TOPMARGIN + row * VSPACING - 8;
 
     // Temporary solution
     int points[5*2];
@@ -203,8 +203,8 @@ void draw_rect(int row, int col, int color) {
 }
 
 void draw_marker(int row, int col, int color) {
-    float x = LEFTMARGIN + col * HSPACING - 12;
-    float y = TOPMARGIN + row * VSPACING - 8;
+    int x = LEFTMARGIN + col * HSPACING - 12;
+    int y = TOPMARGIN + row * VSPACING - 8;
 
     // Temporary solution
     int points[4*2];
@@ -254,8 +254,8 @@ void draw_lines_xy(const int *lines, int x, int y, int color) {
 }
 
 void draw_lines(const int *lines, int row, int col, int color) {
-    float x = LEFTMARGIN + col * HSPACING;
-    float y = TOPMARGIN + row * VSPACING;
+    int x = LEFTMARGIN + col * HSPACING;
+    int y = TOPMARGIN + row * VSPACING;
 
     draw_lines_xy(lines, x, y, color);
 }
@@ -308,6 +308,18 @@ void update_board() {
             game_board[row][col] = chess_piece_at(row, col);
             draw_board_piece(row, col);
         }
+    }
+}
+
+void draw_grid() {
+    for (int row = 0; row < 9; row++) {
+        int y = TOPMARGIN + row * VSPACING-8;
+        platform_draw_line(LEFTMARGIN-12, y, LEFTMARGIN+8*HSPACING-12, y, LOWLIGHT_COLOR);
+    }
+    
+    for (int col = 0; col < 9; col++) {
+        int x = LEFTMARGIN + col * HSPACING-12;
+        platform_draw_line(x, TOPMARGIN-8, x, TOPMARGIN+8*VSPACING-8, LOWLIGHT_COLOR);
     }
 }
 
@@ -620,6 +632,7 @@ boolean game_frame(void) {
         //return false;
     }
 
+    draw_grid();
     draw_board();
     
     switch (game_state) {

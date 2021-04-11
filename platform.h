@@ -31,14 +31,16 @@ void platform_input_wait(void);
 
 // MARK: - Drawing
 
-#define DEFAULT_COLOR     		80
+#define DEFAULT_COLOR           80
 #define HIGHLIGHT_COLOR     	127
+#define LOWLIGHT_COLOR          60
 #define DEFAULT_TEXT_SIZE 		7
 #define DEFAULT_TEXT_SMALL_SIZE 6
 #define DEFAULT_INPUT_WAIT_TIME 30
 
 void platform_draw_points(int* points, int count, int color);
 void platform_draw_continous_points(int* points, int count, int color);
+void platform_draw_line(int x1, int y1, int x2, int y2, int color);
 void platform_msg(char* msg, int x, int y, int size, int color);
 void platform_raster_msg(char* msg, int x, int y, int size, int color);
 
