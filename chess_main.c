@@ -176,7 +176,7 @@ int animation_time = 0;
 
 // MARK: - drawing helpers
 
-void draw_rect(int row, int col) {
+void draw_rect(int row, int col, int color) {
     float x = LEFTMARGIN + col * HSPACING - 12;
     float y = TOPMARGIN + row * VSPACING - 8;
 
@@ -199,10 +199,10 @@ void draw_rect(int row, int col) {
     points[points_count++] = 0;
     points[points_count++] = -VSPACING;
     
-    platform_draw_continous_points(&points[0], points_count, HIGHLIGHT_COLOR);
+    platform_draw_continous_points(&points[0], points_count, color);
 }
 
-void draw_marker(int row, int col) {
+void draw_marker(int row, int col, int color) {
     float x = LEFTMARGIN + col * HSPACING - 12;
     float y = TOPMARGIN + row * VSPACING - 8;
 
@@ -219,7 +219,7 @@ void draw_marker(int row, int col) {
     points[points_count++] = -HSPACING;
     points[points_count++] = 0;
 
-    platform_draw_continous_points(&points[0], points_count,HIGHLIGHT_COLOR);
+    platform_draw_continous_points(&points[0], points_count, color);
 }
 
 void draw_lines_xy(const int *lines, int x, int y, int color) {
@@ -386,15 +386,19 @@ void choose_to_move() {
 }
 
 void draw_from_move() {
-    draw_rect(game_from_y, game_from_x);
+    draw_rect(game_from_y, game_from_x, HIGHLIGHT_COLOR);
 }
 
 void draw_choosen_from_move() {
-    draw_marker(game_from_y,game_from_x);
+    draw_marker(game_from_y, game_from_x, HIGHLIGHT_COLOR);
 }
 
 void draw_to_move() {
-    draw_rect(game_to_y, game_to_x);
+    draw_rect(game_to_y, game_to_x, HIGHLIGHT_COLOR);
+}
+
+void draw_computer_move() {
+    draw_rect(game_comp_to_y, game_comp_to_x, DEFAULT_COLOR);
 }
 
 void wait_for_begin() {
@@ -403,6 +407,8 @@ void wait_for_begin() {
         platform_input_wait();
     }
 }
+
+// MARK: - User message
 
 void build_last_move_position() {
     if (game_state == PLAYER_CHOOSE_FROM) {
@@ -423,6 +429,26 @@ void build_last_computer_position() {
     char h2 = HORIZ[game_comp_to_x];
 
     sprintf(comp_move_str, "C %c%d TO %c%d", h1, 8-game_comp_from_y, h2, 8-game_comp_to_y);
+}
+
+void print_info_top() {
+    platform_msg(comp_move_str, 50, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+    
+    if (strlen(comp_info) > 0) {
+        platform_msg(comp_info, 50, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+    }
+}
+
+void print_info_bottom() {
+    platform_msg(player_move_str, -100, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+    
+    if (strlen(player_info) > 0) {
+        platform_msg(player_info, -100, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+    }
+}
+
+void print_msg(char* msg) {
+    platform_msg(msg, -100, 0, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
 }
 
 // MARK: - Animate figure
@@ -563,28 +589,6 @@ void init_board() {
     update_board();
 }
 
-// MARK: - User message
-
-void print_info_top() {
-    platform_msg(comp_move_str, 50, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
-    
-    if (strlen(comp_info) > 0) {
-        platform_msg(comp_info, 50, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
-    }
-}
-
-void print_info_bottom() {
-    platform_msg(player_move_str, -100, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
-    
-    if (strlen(player_info) > 0) {
-        platform_msg(player_info, -100, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
-    }
-}
-
-void print_msg(char* msg) {
-    platform_msg(msg, -100, 0, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
-}
-
 // MARK: - Game loop
 
 boolean game_win() {
@@ -627,6 +631,7 @@ boolean game_frame(void) {
             break;
         case COMPUTER_ANIMATE:
             animate_computer();
+            draw_computer_move();
             break;
         case COMPUTER_ANIMATE_END:
             game_from_x = 0; game_from_y = 0;
@@ -642,6 +647,7 @@ boolean game_frame(void) {
             }
             break;
         case PLAYER_CHOOSE_FROM:
+            draw_computer_move();
             choose_from_move();
             draw_from_move();
             break;
