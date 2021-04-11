@@ -38,9 +38,8 @@ void platform_input_wait(void);
 #define DEFAULT_TEXT_SMALL_SIZE 6
 #define DEFAULT_INPUT_WAIT_TIME 30
 
-void platform_draw_points(int* points, int count, int color);
-void platform_draw_continous_points(int* points, int count, int color);
 void platform_draw_line(int x1, int y1, int x2, int y2, int color);
+void platform_draw_lines(int* points, int count, int color);
 void platform_msg(char* msg, int x, int y, int size, int color);
 void platform_raster_msg(char* msg, int x, int y, int size, int color);
 

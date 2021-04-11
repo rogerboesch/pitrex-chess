@@ -199,7 +199,7 @@ void draw_rect(int row, int col, int color) {
     points[points_count++] = 0;
     points[points_count++] = -VSPACING;
     
-    platform_draw_continous_points(&points[0], points_count, color);
+    platform_draw_lines(&points[0], points_count, color);
 }
 
 void draw_marker(int row, int col, int color) {
@@ -219,7 +219,7 @@ void draw_marker(int row, int col, int color) {
     points[points_count++] = -HSPACING;
     points[points_count++] = 0;
 
-    platform_draw_continous_points(&points[0], points_count, color);
+    platform_draw_lines(&points[0], points_count, color);
 }
 
 void draw_lines_xy(const int *lines, int x, int y, int color) {
@@ -236,7 +236,7 @@ void draw_lines_xy(const int *lines, int x, int y, int color) {
         int f = *lines;
 
         if (f == 1 || f == 2) {
-            platform_draw_continous_points(&points[0], points_count, color);
+            platform_draw_lines(&points[0], points_count, color);
             return;
         }
 

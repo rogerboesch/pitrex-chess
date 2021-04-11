@@ -1435,7 +1435,7 @@ MOVE computer_think(int depth) {
     t = (double) (stop - start) / CLOCKS_PER_SEC;
     knps = ((double) count_quies_calls / t) / 1000.;
 
-    double ratio_Qsearc_Capcalls = (double) count_quies_calls / (double) count_cap_calls;
+    //double ratio_Qsearc_Capcalls = (double) count_quies_calls / (double) count_cap_calls;
     double decimal_score = ((double) score) / 100.;
     
     if (side == BLACK) {
