@@ -333,7 +333,7 @@ void choose_from_move() {
         }
     }
 
-    if (platform_button_is_pressed(BUTTON_ONE)) {
+    if (platform_button_is_pressed(BUTTON_FOUR)) {
         game_to_x = game_from_x;
         game_to_y = game_from_y;
 
@@ -368,7 +368,7 @@ void choose_to_move() {
         }
     }
     
-    if (platform_button_is_pressed(BUTTON_ONE)) {
+    if (platform_button_is_pressed(BUTTON_FOUR)) {
         game_state = PLAYER_MOVE;
         platform_input_wait();
     }
@@ -387,7 +387,7 @@ void draw_to_move() {
 }
 
 void wait_for_begin() {
-    if (platform_button_is_pressed(BUTTON_ONE)) {
+    if (platform_button_is_pressed(BUTTON_FOUR)) {
         game_state = GAME_START;
         platform_input_wait();
     }
