@@ -22,7 +22,7 @@ int vectrexinit(char viaconfig);
 void v_setName(char *name);
 void v_init(void);
 void v_setRefresh(int hz);
-
+void v_setBrightness(int color) {}
 void v_WaitRecal(void);
 void v_readButtons(void);
 void v_readJoystick1Analog(void);
@@ -47,7 +47,7 @@ int vectrexinit(char viaconfig) { printf("vectrexinit\n"); return 0; }
 void v_setName(char *name) { printf("v_setName: %s\n", name); }
 void v_init(void) { printf("v_init\n"); }
 void v_setRefresh(int hz) { printf("v_setRefresh: %d\n", hz); }
-
+void v_setBrightness(int color) { printf("v_setBrightness: %d\n", color); }
 void v_WaitRecal() { printf("v_WaitRecal ------------------\n"); usleep(20*1000); }
 void v_readButtons() { printf("v_readButtons\n"); }
 void v_readJoystick1Analog() { printf("v_readJoystick1Analog\n"); }
@@ -183,8 +183,8 @@ void platform_msg(char* msg, int x, int y, int size, int color) {
 }
 
 void platform_raster_msg(char* msg, int x, int y, int size, int color) {
-    int tlength = (int)strlen(msg)-1;
-    v_printStringRaster(-30, 80, "ERROR", 40, -7, 0);
+    v_setBrightness(color);
+    v_printStringRaster(x, y, msg, size, -7, '/0');
 }
 
 void platform_draw_line(int x1, int y1, int x2, int y2, int color) {

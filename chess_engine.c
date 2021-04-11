@@ -63,25 +63,25 @@ int piece[64];
 int color[64];
 
 int initialise_piece[64] = {
-  ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK,
-  PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN,
-  EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-  EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-  EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-  EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-  PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN,
-  ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK
+    ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK,
+    PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN,
+    EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+    EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+    EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+    EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+    PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN,
+    ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK
 };
 
 int initialise_color[64] = {
-  BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
-  BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
-  EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-  EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-  EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-  EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-  WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE,
-  WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE
+    BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
+    BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
+    EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+    EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+    EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+    EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+    WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE,
+    WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, WHITE
 };
 
 int computer_move_from_x = 0;
@@ -100,9 +100,9 @@ typedef struct tag_MOVE {
 } MOVE;
 
 typedef struct tag_HIST {
-  MOVE m;
-  int castle;
-  int cap;
+    MOVE m;
+    int castle;
+    int cap;
 } HIST;
 
 HIST hist[6000];
@@ -115,10 +115,8 @@ HIST hist[6000];
 // 1000 -> Black can long castle
 //
 // 15 = 1111 = 1*2^3 + 1*2^2 + 1*2^1 + 1*2^0
-//
 
 int castle_rights = 15;        // At start position all castle types ar available
-
 
 // This mask is applied like this
 //
@@ -132,17 +130,16 @@ int castle_rights = 15;        // At start position all castle types ar availabl
 // 1111 & (1100 & 1111) == 1111 & 1100 == 1100
 //
 // and white's lost all its castle rights
-//
 
 int castle_mask[64] = {
-  7, 15, 15, 15, 3, 15, 15, 11,
-  15, 15, 15, 15, 15, 15, 15, 15,
-  15, 15, 15, 15, 15, 15, 15, 15,
-  15, 15, 15, 15, 15, 15, 15, 15,
-  15, 15, 15, 15, 15, 15, 15, 15,
-  15, 15, 15, 15, 15, 15, 15, 15,
-  15, 15, 15, 15, 15, 15, 15, 15,
-  13, 15, 15, 15, 12, 15, 15, 14
+    7, 15, 15, 15, 3, 15, 15, 11,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    13, 15, 15, 15, 12, 15, 15, 14
 };
 
 int hdp;                // Current move order
@@ -154,74 +151,75 @@ int count_MakeMove;
 int count_quies_calls;
 int count_cap_calls;
 
-/* The values of the pieces in centipawns */
+// The values of the pieces in centipawns
 int value_piece[6] = { VALUE_PAWN, VALUE_KNIGHT, VALUE_BISHOP, VALUE_ROOK, VALUE_QUEEN, VALUE_KING };
 
 // Piece Square Tables
 // When evaluating the position we'll add a bonus (or malus) to each piece
 // depending on the very square where it's placed. Vg, a knight in d4 will
 // be given an extra +15, whilst a knight in a1 will be penalized with -40.
-// This simple idea allows the engine to make more sensible moves */
+// This simple idea allows the engine to make more sensible moves
 int pst_pawn[64] = {
-  0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 15, 15, 0, 0, 0,
-  0, 0, 0, 10, 10, 0, 0, 0,
-  0, 0, 0, 5, 5, 0, 0, 0,
-  0, 0, 0, -25, -25, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 15, 15, 0, 0, 0,
+    0, 0, 0, 10, 10, 0, 0, 0,
+    0, 0, 0, 5, 5, 0, 0, 0,
+    0, 0, 0, -25, -25, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0
 };
 
 int pst_knight[64] = {
-  -40, -25, -25, -25, -25, -25, -25, -40,
-  -30, 0, 0, 0, 0, 0, 0, -30,
-  -30, 0, 0, 0, 0, 0, 0, -30,
-  -30, 0, 0, 15, 15, 0, 0, -30,
-  -30, 0, 0, 15, 15, 0, 0, -30,
-  -30, 0, 10, 0, 0, 10, 0, -30,
-  -30, 0, 0, 5, 5, 0, 0, -30,
-  -40, -30, -25, -25, -25, -25, -30, -40
+    -40, -25, -25, -25, -25, -25, -25, -40,
+    -30, 0, 0, 0, 0, 0, 0, -30,
+    -30, 0, 0, 0, 0, 0, 0, -30,
+    -30, 0, 0, 15, 15, 0, 0, -30,
+    -30, 0, 0, 15, 15, 0, 0, -30,
+    -30, 0, 10, 0, 0, 10, 0, -30,
+    -30, 0, 0, 5, 5, 0, 0, -30,
+    -40, -30, -25, -25, -25, -25, -30, -40
 };
 
 int pst_bishop[64] = {
-  -10, 0, 0, 0, 0, 0, 0, -10,
-  -10, 5, 0, 0, 0, 0, 5, -10,
-  -10, 0, 5, 0, 0, 5, 0, -10,
-  -10, 0, 0, 10, 10, 0, 0, -10,
-  -10, 0, 5, 10, 10, 5, 0, -10,
-  -10, 0, 5, 0, 0, 5, 0, -10,
-  -10, 5, 0, 0, 0, 0, 5, -10,
-  -10, -20, -20, -20, -20, -20, -20, -10
+    -10, 0, 0, 0, 0, 0, 0, -10,
+    -10, 5, 0, 0, 0, 0, 5, -10,
+    -10, 0, 5, 0, 0, 5, 0, -10,
+    -10, 0, 0, 10, 10, 0, 0, -10,
+    -10, 0, 5, 10, 10, 5, 0, -10,
+    -10, 0, 5, 0, 0, 5, 0, -10,
+    -10, 5, 0, 0, 0, 0, 5, -10,
+    -10, -20, -20, -20, -20, -20, -20, -10
 };
 
 int pst_rook[64] = {
-  0, 0, 0, 0, 0, 0, 0, 0,
-  10, 10, 10, 10, 10, 10, 10, 10,
-  0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 5, 5, 0, 0, 0
+    0, 0, 0, 0, 0, 0, 0, 0,
+    10, 10, 10, 10, 10, 10, 10, 10,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 5, 5, 0, 0, 0
 };
 
 int pst_king[64] = {
-  -25, -25, -25, -25, -25, -25, -25, -25,
-  -25, -25, -25, -25, -25, -25, -25, -25,
-  -25, -25, -25, -25, -25, -25, -25, -25,
-  -25, -25, -25, -25, -25, -25, -25, -25,
-  -25, -25, -25, -25, -25, -25, -25, -25,
-  -25, -25, -25, -25, -25, -25, -25, -25,
-  -25, -25, -25, -25, -25, -25, -25, -25,
-  10, 15, -15, -15, -15, -15, 15, 10
+    -25, -25, -25, -25, -25, -25, -25, -25,
+    -25, -25, -25, -25, -25, -25, -25, -25,
+    -25, -25, -25, -25, -25, -25, -25, -25,
+    -25, -25, -25, -25, -25, -25, -25, -25,
+    -25, -25, -25, -25, -25, -25, -25, -25,
+    -25, -25, -25, -25, -25, -25, -25, -25,
+    -25, -25, -25, -25, -25, -25, -25, -25,
+    10, 15, -15, -15, -15, -15, 15, 10
 };
 
 // The flip array is used to calculate the piece/square
 // values for BLACKS pieces, without needing to write the
 // arrays for them (idea taken from TSCP).
 // The piece square value of a white pawn is pst_pawn[sq]
-// and the value of a black pawn is pst_pawn[flip[sq]] */
+// and the value of a black pawn is pst_pawn[flip[sq]]
+
 int flip[64] = {
   56, 57, 58, 59, 60, 61, 62, 63,
   48, 49, 50, 51, 52, 53, 54, 55,
@@ -232,7 +230,6 @@ int flip[64] = {
   8, 9, 10, 11, 12, 13, 14, 15,
   0, 1, 2, 3, 4, 5, 6, 7
 };
-
 
 // MARK: - Move generations
 
@@ -296,259 +293,269 @@ static void generate_push_king(int from, int dest, MOVE * pBuf, int *pMCount) {
 
 // Generate all moves of current_side to move and push them to pBuf, and return number of moves
 static int generate_moves(int current_side, MOVE * pBuf) {
-  int i;
-  int k;
-  int y;
-  int row;
-  int col;
-  int movecount;
-  movecount = 0;
+    int i;
+    int k;
+    int y;
+    int row;
+    int col;
+    int movecount = 0;
 
-  for (i = 0; i < 64; i++)    /* Scan all board */
-    if (color[i] == current_side)
-      {
-    switch (piece[i])
-      {
+    for (i = 0; i < 64; i++) {
+        if (color[i] == current_side) {
+            switch (piece[i]) {
+                case PAWN:
+                    col = COL (i);
+                    row = ROW (i);
+                   
+                    if (current_side == BLACK) {
+                        // Pawn advances one square. We use generate_push_pawn because it can be a promotion
+                        if (color[i + 8] == EMPTY)
+                            generate_push_pawn (i, i + 8, pBuf, &movecount);
+                    
+                        // Pawn advances two squares
+                        if (row == 1 && color[i + 8] == EMPTY && color[i + 16] == EMPTY)
+                            generate_push_pawn_two (i, i + 16, pBuf, &movecount);
+                        
+                        // Pawn captures and it can be a promotion
+                        if (col && color[i + 7] == WHITE)
+                            generate_push_pawn (i, i + 7, pBuf, &movecount);
+                        
+                        // Pawn captures and can be a promotion
+                        if (col < 7 && color[i + 9] == WHITE)
+                            generate_push_pawn (i, i + 9, pBuf, &movecount);
+                        
+                        // For en passant capture. Pawn captures and it can be a promotion
+                        if (col && piece[i + 7] == EPS_SQUARE)
+                            generate_push_pawn (i, i + 7, pBuf, &movecount);
+                    
+                        // Pawn captures and can be a promotion
+                        if (col < 7 && piece[i + 9] == EPS_SQUARE)
+                            generate_push_pawn (i, i + 9, pBuf, &movecount);
+                    }
+                    else {
+                        if (color[i - 8] == EMPTY)
+                            generate_push_pawn (i, i - 8, pBuf, &movecount);
+                    
+                        // Pawn moves 2 squares
+                        if (row == 6 && color[i - 8] == EMPTY && color[i - 16] == EMPTY)
+                            generate_push_pawn_two (i, i - 16, pBuf, &movecount);
+                    
+                        // For captures
+                        if (col && color[i - 9] == BLACK)
+                            generate_push_pawn (i, i - 9, pBuf, &movecount);
+                    
+                        if (col < 7 && color[i - 7] == BLACK)
+                            generate_push_pawn (i, i - 7, pBuf, &movecount);
+                    
+                        // For en passant capture
+                        if (col && piece[i - 9] == EPS_SQUARE)
+                            generate_push_pawn (i, i - 9, pBuf, &movecount);
+                        if (col < 7 && piece[i - 7] == EPS_SQUARE)
+                            generate_push_pawn (i, i - 7, pBuf, &movecount);
+                    }
+                    break;
+                    
+                // == BISHOP+ROOK
+                case QUEEN:
+                case BISHOP:
+                    for (y = i - 9; y >= 0 && COL (y) != 7; y -= 9) {
+                        // go left up
+                        if (color[y] != current_side)
+                            generate_push_normal (i, y, pBuf, &movecount);
+                    
+                        if (color[y] != EMPTY)
+                            break;
+                    }
+                    
+                    for (y = i - 7; y >= 0 && COL (y) != 0; y -= 7) {
+                        // go right up
+                        if (color[y] != current_side)
+                            generate_push_normal (i, y, pBuf, &movecount);
+                    
+                        if (color[y] != EMPTY)
+                            break;
+                    }
+                    
+                    for (y = i + 9; y < 64 && COL (y) != 0; y += 9) {
+                        // go right down
+                        if (color[y] != current_side)
+                            generate_push_normal (i, y, pBuf, &movecount);
+                    
+                        if (color[y] != EMPTY)
+                            break;
+                    }
+                    
+                    for (y = i + 7; y < 64 && COL (y) != 7; y += 7) {
+                        // go left down
+                        if (color[y] != current_side)
+                            generate_push_normal (i, y, pBuf, &movecount);
+                    
+                        if (color[y] != EMPTY)
+                            break;
+                    }
+                    
+                    // In the case of the bishop we're done
+                    if (piece[i] == BISHOP)
+                        break;
 
-      case PAWN:
-        col = COL (i);
-        row = ROW (i);
-        if (current_side == BLACK)
-          {
-        if (color[i + 8] == EMPTY)
-          /* Pawn advances one square.
-           * We use generate_push_pawn because it can be a promotion */
-          generate_push_pawn (i, i + 8, pBuf, &movecount);
-        if (row == 1 && color[i + 8] == EMPTY
-            && color[i + 16] == EMPTY)
-          /* Pawn advances two squares */
-          generate_push_pawn_two (i, i + 16, pBuf, &movecount);
-        if (col && color[i + 7] == WHITE)
-          /* Pawn captures and it can be a promotion */
-          generate_push_pawn (i, i + 7, pBuf, &movecount);
-        if (col < 7 && color[i + 9] == WHITE)
-          /* Pawn captures and can be a promotion */
-          generate_push_pawn (i, i + 9, pBuf, &movecount);
-        /* For en passant capture */
-        if (col && piece[i + 7] == EPS_SQUARE)
-          /* Pawn captures and it can be a promotion */
-          generate_push_pawn (i, i + 7, pBuf, &movecount);
-        if (col < 7 && piece[i + 9] == EPS_SQUARE)
-          /* Pawn captures and can be a promotion */
-          generate_push_pawn (i, i + 9, pBuf, &movecount);
-          }
-        else
-          {
-        if (color[i - 8] == EMPTY)
-          generate_push_pawn (i, i - 8, pBuf, &movecount);
-        /* Pawn moves 2 squares */
-        if (row == 6 && color[i - 8] == EMPTY
-            && color[i - 16] == EMPTY)
-          generate_push_pawn_two (i, i - 16, pBuf, &movecount);
-        /* For captures */
-        if (col && color[i - 9] == BLACK)
-          generate_push_pawn (i, i - 9, pBuf, &movecount);
-        if (col < 7 && color[i - 7] == BLACK)
-          generate_push_pawn (i, i - 7, pBuf, &movecount);
-        /* For en passant capture */
-        if (col && piece[i - 9] == EPS_SQUARE)
-          generate_push_pawn (i, i - 9, pBuf, &movecount);
-        if (col < 7 && piece[i - 7] == EPS_SQUARE)
-          generate_push_pawn (i, i - 7, pBuf, &movecount);
-          }
-        break;
+                // FALL THROUGH FOR QUEEN
+                case ROOK:
+                    col = COL (i);
+                    // go left
+                    for (k = i - col, y = i - 1; y >= k; y--) {
+                        if (color[y] != current_side)
+                            generate_push_normal (i, y, pBuf, &movecount);
+                    
+                        if (color[y] != EMPTY)
+                            break;
+                    }
+                    
+                    // go right
+                    for (k = i - col + 7, y = i + 1; y <= k; y++) {
+                        if (color[y] != current_side)
+                            generate_push_normal (i, y, pBuf, &movecount);
+                    
+                        if (color[y] != EMPTY)
+                            break;
+                    }
+                    
+                    // go up
+                    for (y = i - 8; y >= 0; y -= 8) {
+                        if (color[y] != current_side)
+                            generate_push_normal (i, y, pBuf, &movecount);
+                    
+                        if (color[y] != EMPTY)
+                            break;
+                    }
+                    
+                    // go down
+                    for (y = i + 8; y < 64; y += 8) {
+                        if (color[y] != current_side)
+                            generate_push_normal (i, y, pBuf, &movecount);
+                    
+                        if (color[y] != EMPTY)
+                            break;
+                    }
+                    break;
 
-      case QUEEN:        /* == BISHOP+ROOK */
+                case KNIGHT:
+                    col = COL (i);
+                    y = i - 6;
+                    if (y >= 0 && col < 6 && color[y] != current_side)
+                        generate_push_normal (i, y, pBuf, &movecount);
+                    
+                    y = i - 10;
+                    if (y >= 0 && col > 1 && color[y] != current_side)
+                        generate_push_normal (i, y, pBuf, &movecount);
+                    
+                    y = i - 15;
+                    if (y >= 0 && col < 7 && color[y] != current_side)
+                        generate_push_normal (i, y, pBuf, &movecount);
+                    
+                    y = i - 17;
+                    if (y >= 0 && col > 0 && color[y] != current_side)
+                        generate_push_normal (i, y, pBuf, &movecount);
+                    
+                    y = i + 6;
+                    if (y < 64 && col > 1 && color[y] != current_side)
+                        generate_push_normal (i, y, pBuf, &movecount);
+                    
+                    y = i + 10;
+                    if (y < 64 && col < 6 && color[y] != current_side)
+                        generate_push_normal (i, y, pBuf, &movecount);
+                    
+                    y = i + 15;
+                    if (y < 64 && col > 0 && color[y] != current_side)
+                        generate_push_normal (i, y, pBuf, &movecount);
+                    
+                    y = i + 17;
+                    if (y < 64 && col < 7 && color[y] != current_side)
+                        generate_push_normal (i, y, pBuf, &movecount);
+                break;
 
-      case BISHOP:
-        for (y = i - 9; y >= 0 && COL (y) != 7; y -= 9)
-          {            /* go left up */
-        if (color[y] != current_side)
-          generate_push_normal (i, y, pBuf, &movecount);
-        if (color[y] != EMPTY)
-          break;
-          }
-        for (y = i - 7; y >= 0 && COL (y) != 0; y -= 7)
-          {            /* go right up */
-        if (color[y] != current_side)
-          generate_push_normal (i, y, pBuf, &movecount);
-        if (color[y] != EMPTY)
-          break;
-          }
-        for (y = i + 9; y < 64 && COL (y) != 0; y += 9)
-          {            /* go right down */
-        if (color[y] != current_side)
-          generate_push_normal (i, y, pBuf, &movecount);
-        if (color[y] != EMPTY)
-          break;
-          }
-        for (y = i + 7; y < 64 && COL (y) != 7; y += 7)
-          {            /* go left down */
-        if (color[y] != current_side)
-          generate_push_normal (i, y, pBuf, &movecount);
-        if (color[y] != EMPTY)
-          break;
-          }
-        if (piece[i] == BISHOP)    /* In the case of the bishop we're done */
-          break;
+                case KING:
+                    // the column and rank checks are to make sure it is on the board, The 'normal' moves
+                    // left
+                    col = COL (i);
+                    if (col && color[i - 1] != current_side)
+                        generate_push_king (i, i - 1, pBuf, &movecount);
+                    
+                    // right
+                    if (col < 7 && color[i + 1] != current_side)
+                        generate_push_king (i, i + 1, pBuf, &movecount);
+                    
+                    // up
+                    if (i > 7 && color[i - 8] != current_side)
+                        generate_push_king (i, i - 8, pBuf, &movecount);
+                    
+                    // down
+                    if (i < 56 && color[i + 8] != current_side)
+                        generate_push_king (i, i + 8, pBuf, &movecount);
+                    
+                    // left up
+                    if (col && i > 7 && color[i - 9] != current_side)
+                        generate_push_king (i, i - 9, pBuf, &movecount);
+                    
+                    // right up
+                    if (col < 7 && i > 7 && color[i - 7] != current_side)
+                        generate_push_king (i, i - 7, pBuf, &movecount);
+                    
+                    // left down
+                    if (col && i < 56 && color[i + 7] != current_side)
+                        generate_push_king (i, i + 7, pBuf, &movecount);
+                    
+                    // right down
+                    if (col < 7 && i < 56 && color[i + 9] != current_side)
+                        generate_push_king (i, i + 9, pBuf, &movecount);
 
-        /* FALL THROUGH FOR QUEEN {I meant to do that!} ;-) */
-      case ROOK:
-        col = COL (i);
-        for (k = i - col, y = i - 1; y >= k; y--)
-          {            /* go left */
-        if (color[y] != current_side)
-          generate_push_normal (i, y, pBuf, &movecount);
-        if (color[y] != EMPTY)
-          break;
-          }
-        for (k = i - col + 7, y = i + 1; y <= k; y++)
-          {            /* go right */
-        if (color[y] != current_side)
-          generate_push_normal (i, y, pBuf, &movecount);
-        if (color[y] != EMPTY)
-          break;
-          }
-        for (y = i - 8; y >= 0; y -= 8)
-          {            /* go up */
-        if (color[y] != current_side)
-          generate_push_normal (i, y, pBuf, &movecount);
-        if (color[y] != EMPTY)
-          break;
-          }
-        for (y = i + 8; y < 64; y += 8)
-          {            /* go down */
-        if (color[y] != current_side)
-          generate_push_normal (i, y, pBuf, &movecount);
-        if (color[y] != EMPTY)
-          break;
-          }
-        break;
+                    // The castle moves
+                    if (current_side == WHITE) {
+                        // Can white short castle?
+                        if (castle_rights & 1) {
+                            // If white can castle the white king has to be in square 60
+                            if (col && color[i + 1] == EMPTY && color[i + 2] == EMPTY && !is_in_check (current_side) && !is_attacked (current_side, i + 1)) {
+                                // The king goes 2 sq to the left
+                                generate_push_king (i, i + 2, pBuf, &movecount);
+                            }
+                        }
 
-      case KNIGHT:
-        col = COL (i);
-        y = i - 6;
-        if (y >= 0 && col < 6 && color[y] != current_side)
-          generate_push_normal (i, y, pBuf, &movecount);
-        y = i - 10;
-        if (y >= 0 && col > 1 && color[y] != current_side)
-          generate_push_normal (i, y, pBuf, &movecount);
-        y = i - 15;
-        if (y >= 0 && col < 7 && color[y] != current_side)
-          generate_push_normal (i, y, pBuf, &movecount);
-        y = i - 17;
-        if (y >= 0 && col > 0 && color[y] != current_side)
-          generate_push_normal (i, y, pBuf, &movecount);
-        y = i + 6;
-        if (y < 64 && col > 1 && color[y] != current_side)
-          generate_push_normal (i, y, pBuf, &movecount);
-        y = i + 10;
-        if (y < 64 && col < 6 && color[y] != current_side)
-          generate_push_normal (i, y, pBuf, &movecount);
-        y = i + 15;
-        if (y < 64 && col > 0 && color[y] != current_side)
-          generate_push_normal (i, y, pBuf, &movecount);
-        y = i + 17;
-        if (y < 64 && col < 7 && color[y] != current_side)
-          generate_push_normal (i, y, pBuf, &movecount);
-        break;
+                        // Can white long castle?
+                        if (castle_rights & 2) {
+                            if (col && color[i - 1] == EMPTY && color[i - 2] == EMPTY && color[i - 3] == EMPTY && !is_in_check (current_side) && !is_attacked (current_side, i - 1)) {
+                                /* The king goes 2 sq to the left */
+                                generate_push_king (i, i - 2, pBuf, &movecount);
+                            }
+                        }
+                    }
+                    else if (current_side == BLACK) {
+                        // Can black short castle?
+                        if (castle_rights & 4) {
+                            // If white can castle the white king has to be in square 60
+                            if (col && color[i + 1] == EMPTY && color[i + 2] == EMPTY && piece[i + 3] == ROOK && !is_in_check (current_side) && !is_attacked (current_side, i + 1)) {
+                                // The king goes 2 sq to the left
+                                generate_push_king (i, i + 2, pBuf, &movecount);
+                            }
+                        }
+                    
+                        // Can black long castle?
+                        if (castle_rights & 8) {
+                            if (col &&  color[i - 1] == EMPTY &&    color[i - 2] == EMPTY && color[i - 3] == EMPTY && piece[i - 4] == ROOK && !is_in_check (current_side) && !is_attacked (current_side, i - 1)) {
+                                // The king goes 2 sq to the left
+                                generate_push_king (i, i - 2, pBuf, &movecount);
+                            }
+                        }
+                    }
 
-      case KING:
-        /* the column and rank checks are to make sure it is on the board */
-        /* The 'normal' moves */
-        col = COL (i);
-        if (col && color[i - 1] != current_side)
-          generate_push_king (i, i - 1, pBuf, &movecount);    /* left */
-        if (col < 7 && color[i + 1] != current_side)
-          generate_push_king (i, i + 1, pBuf, &movecount);    /* right */
-        if (i > 7 && color[i - 8] != current_side)
-          generate_push_king (i, i - 8, pBuf, &movecount);    /* up */
-        if (i < 56 && color[i + 8] != current_side)
-          generate_push_king (i, i + 8, pBuf, &movecount);    /* down */
-        if (col && i > 7 && color[i - 9] != current_side)
-          generate_push_king (i, i - 9, pBuf, &movecount);    /* left up */
-        if (col < 7 && i > 7 && color[i - 7] != current_side)
-          generate_push_king (i, i - 7, pBuf, &movecount);    /* right up */
-        if (col && i < 56 && color[i + 7] != current_side)
-          generate_push_king (i, i + 7, pBuf, &movecount);    /* left down */
-        if (col < 7 && i < 56 && color[i + 9] != current_side)
-          generate_push_king (i, i + 9, pBuf, &movecount);    /* right down */
+                    break;
+                }
+        }
+    }
 
-        /* The castle moves */
-        if (current_side == WHITE)
-          {
-        /* Can white short castle? */
-        if (castle_rights & 1)
-          {
-            /* If white can castle the white king has to be in square 60 */
-            if (col &&
-            color[i + 1] == EMPTY &&
-            color[i + 2] == EMPTY &&
-            !is_in_check (current_side) &&
-            !is_attacked (current_side, i + 1))
-              {
-            /* The king goes 2 sq to the left */
-            generate_push_king (i, i + 2, pBuf, &movecount);
-              }
-          }
-
-        /* Can white long castle? */
-        if (castle_rights & 2)
-          {
-            if (col &&
-            color[i - 1] == EMPTY &&
-            color[i - 2] == EMPTY &&
-            color[i - 3] == EMPTY &&
-            !is_in_check (current_side) &&
-            !is_attacked (current_side, i - 1))
-              {
-            /* The king goes 2 sq to the left */
-            generate_push_king (i, i - 2, pBuf, &movecount);
-              }
-          }
-          }
-        else if (current_side == BLACK)
-          {
-        /* Can black short castle? */
-        if (castle_rights & 4)
-          {
-            /* If white can castle the white king has to be in square 60 */
-            if (col &&
-            color[i + 1] == EMPTY &&
-            color[i + 2] == EMPTY &&
-            piece[i + 3] == ROOK &&
-            !is_in_check (current_side) &&
-            !is_attacked (current_side, i + 1))
-              {
-            /* The king goes 2 sq to the left */
-            generate_push_king (i, i + 2, pBuf, &movecount);
-              }
-          }
-        /* Can black long castle? */
-        if (castle_rights & 8)
-          {
-            if (col &&
-            color[i - 1] == EMPTY &&
-            color[i - 2] == EMPTY &&
-            color[i - 3] == EMPTY &&
-            piece[i - 4] == ROOK &&
-            !is_in_check (current_side) &&
-            !is_attacked (current_side, i - 1))
-              {
-            /* The king goes 2 sq to the left */
-            generate_push_king (i, i - 2, pBuf, &movecount);
-              }
-          }
-          }
-
-        break;
-      }
-      }
-  return movecount;
+    return movecount;
 }
 
 // Gen all captures of current_side to move and push them to pBuf, return number of moves
-// It's necesary at least ir order to use quiescent in the ab_search */
+// It's necesary at least ir order to use quiescent in the ab_search
 static int generate_captures(int current_side, MOVE * pBuf) {
   int i;
   int k;
