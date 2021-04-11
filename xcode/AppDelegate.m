@@ -34,6 +34,10 @@ int chess_main(void);
     });
 }
 
++ (void)setSize:(int)width height:(int)height {
+    [[AppDelegate sharedDelegate].view setRenderSize:width height:height];
+}
+
 + (void)renderPlayground:(NSImage *)image {
     dispatch_async(dispatch_get_main_queue(), ^{
         [[AppDelegate sharedDelegate].view render:image];
@@ -84,3 +88,7 @@ int chess_main(void);
 }
 
 @end
+
+void platform_set_size(int width, int height) {
+    [AppDelegate setSize:width height:height];
+}

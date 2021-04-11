@@ -12,7 +12,7 @@
 
 // MARK: - Platform
 
-void platform_init(char* name);
+void platform_init(char* name, int width, int height);
 void platform_frame(void);
 
 // MARK: - Input handling

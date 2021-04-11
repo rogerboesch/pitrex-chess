@@ -25,6 +25,8 @@ void chess_initialize(void);
 #define BLACK 0
 #define BLACK_OFFSET 10
 #define HORIZ "ABCDEFGH"
+#define SCREEN_WIDTH 360
+#define SCREEN_HEIGHT 480
 
 const int pawn[] = {
     -1,0*SCALE,-10*SCALE,
@@ -724,7 +726,7 @@ int main() {
 #else
 int chess_main() {
 #endif
-    platform_init("chess");
+    platform_init("chess", SCREEN_WIDTH, SCREEN_HEIGHT);
     
     game_start();
 

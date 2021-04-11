@@ -52,6 +52,11 @@ int  v_printStringRaster(int8_t x, int8_t y, char* str, int8_t xSize, int8_t ySi
 
 #pragma mark - Render
 
+- (void)setRenderSize:(int)width height:(int)height {
+    render_width = width;
+    render_height = height;
+}
+
 - (void)render:(NSImage *)image {
     self.renderImageView.image = image;
 }
@@ -211,6 +216,8 @@ void fb_init(void) {
         free(pixel_buffer);
         pixel_buffer = NULL;
     }
+    
+    printf("Create tender buffer %dx%d\n", render_width, render_height);
     
     pixel_buffer = (unsigned char *)malloc(render_width * render_height * 4);
 }

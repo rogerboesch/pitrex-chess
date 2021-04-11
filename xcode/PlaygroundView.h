@@ -14,5 +14,6 @@
 }
 
 - (void)render:(NSImage *)image;
+- (void)setRenderSize:(int)width height:(int)height;
 
 @end

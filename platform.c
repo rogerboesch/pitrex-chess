@@ -23,6 +23,8 @@ int usePipeline = 1;
 #define CLIP true
 #define NO_CLIP false
 
+extern void platform_set_size(int width, int height);
+
 int vectrexinit(char viaconfig);
 void v_setName(char *name);
 void v_init(void);
@@ -32,7 +34,7 @@ void v_WaitRecal(void);
 void v_readButtons(void);
 void v_readJoystick1Analog(void);
 
-void v_window(int left, int bottom, int right, int top, boolean clipping) {}
+void v_window(int left, int bottom, int right, int top, boolean clipping) { platform_set_size(right-left, top-bottom); }
 void v_directDraw32(int x1, int y1, int x2, int y2, int color);
 void v_printString(int x, int y, char* str, int textSize, int color);
 int  v_printStringRaster(int8_t x, int8_t y, char* str, int8_t xSize, int8_t ySize, unsigned char delimiter);
@@ -49,14 +51,14 @@ static int platform_wait_count = 0;
 
 // MARK: - Platform
 
-void platform_init(char* name) {
+void platform_init(char* name, int width, int height) {
     vectrexinit(1);
     v_setName(name);
     v_init();
 	usePipeline = 1;
     v_setRefresh(60);
 	v_setBrightness(DEFAULT_COLOR);
-    v_window(0, 0, 360, 360, NO_CLIP);
+    v_window(0, 0, width, height, CLIP);
 }
 
 void platform_frame(void) {
