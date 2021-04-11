@@ -13,6 +13,10 @@ Next steps are:
 
 TODO:
 
+Windowing:
+- Use v_window and remove conversion to DAC coordinates
+- Organise playfield in *top area info* | *playfield* | *bottom area info*
+
 UI:
 - Visual feedback of check
 - Visual feedback of check mate
