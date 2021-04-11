@@ -408,13 +408,13 @@ void build_last_move_position() {
     if (game_state == PLAYER_CHOOSE_FROM) {
         char h1 = HORIZ[game_from_x];
 
-        sprintf(player_move_str, "%c%d TO ", h1, 7-game_from_y);
+        sprintf(player_move_str, "P %c%d TO ", h1, 7-game_from_y);
     }
     else {
         char h1 = HORIZ[game_from_x];
         char h2 = HORIZ[game_to_x];
 
-        sprintf(player_move_str, "%c%d TO %c%d", h1, 7-game_from_x, h2, 7-game_to_y);
+        sprintf(player_move_str, "P %c%d TO %c%d", h1, 7-game_from_x, h2, 7-game_to_y);
     }
 }
 
@@ -422,7 +422,7 @@ void build_last_computer_position() {
     char h1 = HORIZ[game_comp_from_x];
     char h2 = HORIZ[game_comp_to_x];
 
-    sprintf(comp_move_str, "%c%d TO %c%d", h1, 8-game_comp_from_y, h2, 8-game_comp_to_y);
+    sprintf(comp_move_str, "C %c%d TO %c%d", h1, 8-game_comp_from_y, h2, 8-game_comp_to_y);
 }
 
 // MARK: - Animate figure
@@ -566,10 +566,10 @@ void init_board() {
 // MARK: - User message
 
 void print_info_top() {
-    platform_msg(comp_move_str, -100, 128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+    platform_msg(comp_move_str, 50, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
     
     if (strlen(comp_info) > 0) {
-        platform_msg(comp_info, 100, 128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+        platform_msg(comp_info, 50, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
     }
 }
 
@@ -577,12 +577,12 @@ void print_info_bottom() {
     platform_msg(player_move_str, -100, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
     
     if (strlen(player_info) > 0) {
-        platform_msg(player_info, 100, 128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+        platform_msg(player_info, -100, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
     }
 }
 
 void print_msg(char* msg) {
-    platform_msg(msg, -100, 128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+    platform_msg(msg, -100, 0, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
 }
 
 // MARK: - Game loop

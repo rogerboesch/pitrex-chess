@@ -184,7 +184,7 @@ void platform_msg(char* msg, int x, int y, int size, int color) {
 
 void platform_raster_msg(char* msg, int x, int y, int size, int color) {
     v_setBrightness(color);
-    v_printStringRaster(x, y, msg, size, -7, '/0');
+    v_printStringRaster(x, y, msg, size, -7, 0);
 }
 
 void platform_draw_line(int x1, int y1, int x2, int y2, int color) {
