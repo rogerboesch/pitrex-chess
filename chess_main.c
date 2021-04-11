@@ -439,18 +439,20 @@ void build_last_computer_position() {
 }
 
 void display_computer_info() {
-    platform_msg(comp_move_str, 50, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
-    
     if (strlen(comp_info) > 0) {
         platform_msg(comp_info, 50, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+    }
+    else {
+        platform_msg(comp_move_str, 50, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
     }
 }
 
 void display_user_info() {
-    platform_msg(player_move_str, -100, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
-    
     if (strlen(player_info) > 0) {
         platform_msg(player_info, -100, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+    }
+    else {
+        platform_msg(player_move_str, -100, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
     }
 }
 
