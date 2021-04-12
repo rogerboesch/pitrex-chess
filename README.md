@@ -2,7 +2,8 @@
 
 This is work in progress version of chess for the PiTrex. 
 
-![Chess][lassets/chess.png]
+![Chess](assets/chess.png "Logo Title Text 1")
+
 Next steps are:
 
 - Baremetal support added, thanks Malban! [04-12-21]
