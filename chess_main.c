@@ -671,7 +671,7 @@ boolean game_frame(void) {
     switch (game_state) {
         case GAME_INITIALIZE:
             wait_for_begin();
-            display_msg(PRG_NAME, "PRESS BUTTON TO START");
+            display_msg(PRG_NAME, "PRESS BUTTON 4 TO START");
             break;
         case GAME_START:
             computer_move();
