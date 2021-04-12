@@ -12,6 +12,9 @@
 #include <vectrex/vectrexInterface.h>
 #include "window.h"
 
+static int screen_width = 0;
+static int screen_height = 0;
+
 #elif PITREX_PLAYGROUND
 // Pitrex calls forwarded to playground
 
@@ -21,9 +24,6 @@ int currentJoy1Y = 0;
 static int usePipeline = 1;
 static int screen_width = 0;
 static int screen_height = 0;
-
-#define CLIP true
-#define NO_CLIP false
 
 extern void platform_set_size(int width, int height);
 
@@ -54,6 +54,9 @@ static int platform_wait_count = 0;
 // MARK: - Platform
 
 void platform_init(char* name, int width, int height) {
+    screen_width = width;
+    screen_height = height;
+    
     vectrexinit(1);
     v_setName(name);
     v_init();
