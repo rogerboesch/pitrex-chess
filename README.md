@@ -3,7 +3,7 @@
 This is work in progress version of **Chess for the PiTrex**. 
 
 Build:
-- Install the PiTrex repo on your PiTrex (more info see here: http://classicscoder.com/pitrex/)
+- Install the PiTrex repo on your PiTrex (for more infos see here: http://classicscoder.com/pitrex/)
 - Build by enter  ``make``
 - Run with ``sudo ./chess``
 
