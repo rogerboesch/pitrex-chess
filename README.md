@@ -1,6 +1,8 @@
 # PiTrex chess
 
-This is an early stage and "brute force" port of chess to the PiTrex. 
+This is work in progress version of chess for the PiTrex. 
+
+![Chess][lassets/chess.png]
 Next steps are:
 
 - Baremetal support added, thanks Malban! [04-12-21]
