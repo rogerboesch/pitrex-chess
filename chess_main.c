@@ -680,6 +680,7 @@ boolean game_frame(void) {
         	break;
         case COMPUTER_MOVED:
             sprintf(comp_info, "");
+            build_last_user_position();
             build_last_computer_position();
             animation_counter = 0;
             animation_time = distance() * ANIMATION_TIME;
