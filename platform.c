@@ -185,9 +185,9 @@ void platform_draw_line(int x1, int y1, int x2, int y2, int color) {
     // int yy2 = MAX_DAC * y2 / 400 - DAC;
 
     // v_directDraw32(xx1, yy1, xx2, yy2, color);
-	v_line(screen_width-x1, y1, screen_width-x2, y2, color);
+	v_line(x1, y1, x2, y2, color);
 #else
-    v_directDraw32(screen_width-x1, y1, screen_width-x2, y2, color);
+    v_directDraw32(x1, y1, x2, y2, color);
 #endif
 }
 
