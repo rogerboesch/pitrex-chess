@@ -45,23 +45,28 @@ int  v_printStringRaster(int8_t x, int8_t y, char* str, int8_t xSize, int8_t ySi
 #error Either PITREX or PITREX_PLAYGROUND must defined
 #endif
 
-#define MAX_DAC 32768
-#define DAC MAX_DAC/2
-
 static boolean platform_wait = false;
 static int platform_wait_count = 0;
 
 // MARK: - Platform
 
-void platform_init(char* name, int width, int height) {
+void platform_init(char* name, int width, int height, int hz) {
     screen_width = width;
     screen_height = height;
     
     vectrexinit(1);
+#ifndef FREESTANDING
     v_setName(name);
+#endif
     v_init();
 	usePipeline = 1;
-    v_setRefresh(60);
+#ifdef FREESTANDING
+    v_setupIRQHandling();
+    v_enableJoystickAnalog(1,1,0,0);
+    v_enableButtons(1);
+#endif
+
+    v_setRefresh(hz);
 	v_setBrightness(DEFAULT_COLOR);
     v_window(0, 0, width, height, false);
 }

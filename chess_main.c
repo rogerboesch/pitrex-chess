@@ -3,7 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <pthread.h>
+
+#ifndef FREESTANDING
+    #include <pthread.h>
+#endif
 
 // MARK: -  Chess engine calls
 
@@ -576,10 +579,21 @@ void animate_computer() {
 
 // MARK: - Chess
 
+#ifdef FREESTANDING
+
+void computer_move() {
+    game_change_state(COMPUTER_THINK);
+    chess_computer_move();
+    chess_last_move(&game_comp_from_x, &game_comp_from_y, &game_comp_to_x, &game_comp_to_y);
+    game_change_state(COMPUTER_MOVED);
+}
+
+#else
+
 void* threadFunction(void* args) {
-	printf("Start thinking in thread\n");
-	chess_computer_move();
-	printf("End of thinking in thread\n");
+    printf("Start thinking in thread\n");
+    chess_computer_move();
+    printf("End of thinking in thread\n");
 
     chess_last_move(&game_comp_from_x, &game_comp_from_y, &game_comp_to_x, &game_comp_to_y);
     
@@ -589,13 +603,13 @@ void* threadFunction(void* args) {
 }
 
 void computer_move() {
-	pthread_t id;
+    pthread_t id;
     int ret;
     
     // creating thread
     ret = pthread_create(&id, NULL, &threadFunction,NULL);
     if (ret == 0) {
-    	printf("Thinking thread created successfully.\n");
+        printf("Thinking thread created successfully.\n");
 
         game_change_state(COMPUTER_THINK);
         sprintf(comp_info, "THINKING");
@@ -604,6 +618,8 @@ void computer_move() {
         printf("Thread not created.\n");
     }
 }
+
+#endif
 
 boolean user_move() {
     int from = game_from_y*8+game_from_x;
@@ -764,7 +780,7 @@ int main() {
 #else
 int chess_main() {
 #endif
-    platform_init("chess", SCREEN_WIDTH, SCREEN_HEIGHT);
+    platform_init("chess", SCREEN_WIDTH, SCREEN_HEIGHT, 50);
     
     game_start();
 

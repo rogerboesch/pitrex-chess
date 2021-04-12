@@ -1,9 +1,26 @@
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 #include <stdlib.h>
 #include <locale.h>
 #include <assert.h>
+
+#ifdef FREESTANDING
+
+#include <vectrex/vectrexInterface.h>
+
+#define CLOCKS_PER_SEC 1000000
+#define clock_t unsigned int
+
+unsigned int clock() {
+    unsigned int val;
+    CCNT0(val);
+    
+    return val;
+}
+
+#else
+#include <time.h>
+#endif
 
 #define PAWN 0
 #define KNIGHT 1
