@@ -459,7 +459,7 @@ void wait_for_begin() {
 void build_last_user_position() {
     sprintf(player_info, "");
 
-    if (game_state == PLAYER_CHOOSE_FROM) {
+    if (game_state == PLAYER_CHOOSE_FROM || game_state == COMPUTER_MOVED) {
         char h1 = HORIZ[game_from_x];
 
         sprintf(player_move_str, "P %c%d TO ", h1, 8-game_from_y);
