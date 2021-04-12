@@ -15,18 +15,20 @@ void chess_initialize(void);
 
 // MARK: - Graphic assets
 
+#define SCREEN_WIDTH 362
+#define SCREEN_HEIGHT 482
+#define TOPMARGIN (SCREEN_HEIGHT-SCREEN_WIDTH)/2+1
+#define LEFTMARGIN 1
+
+#define HSPACING SCREEN_WIDTH/8
+#define VSPACING SCREEN_WIDTH/8
 #define SCALE 2
-#define HSPACING SCALE*20
-#define VSPACING SCALE*28
-#define TOPMARGIN 35
-#define LEFTMARGIN 50
+#define RENDER_SCALE 4/5
 
 #define WHITE 3
 #define BLACK 0
 #define BLACK_OFFSET 10
 #define HORIZ "ABCDEFGH"
-#define SCREEN_WIDTH 360
-#define SCREEN_HEIGHT 480
 
 const int pawn[] = {
     -1,0*SCALE,-10*SCALE,
@@ -145,8 +147,8 @@ const int king[] = {
 #define QUEEN   5
 #define KING    6
 
-const int *pieces[8] = {castle, knight, bishop, queen, king, bishop, knight, castle};
-const int *piece_type[6] = {pawn, knight, bishop, castle, queen, king};
+const int* pieces[8] = {castle, knight, bishop, queen, king, bishop, knight, castle};
+const int* piece_type[6] = {pawn, knight, bishop, castle, queen, king};
 
 typedef enum _GAME_STATE {
     GAME_INITIALIZE, GAME_START, GAME_END,
@@ -154,10 +156,16 @@ typedef enum _GAME_STATE {
     PLAYER_CHOOSE_FROM, PLAYER_CHOOSE_TO, PLAYER_MOVE, PLAYER_ANIMATE, PLAYER_ANIMATE_END
 } GAME_STATE;
 
+const char* states[] = {"initialize", "start", "end",
+                        "computer think", "computer moved", "computer animate", "computer animate end",
+                        "player choose FROM", "player choose TO", "player move", "player animate", "player animate end"
+                        };
+
 // MARK: - Forwards
 
 void update_board(void);
 void build_last_user_position(void);
+void game_change_state(int to_state);
 
 // MARK: - Game vars
 
@@ -229,8 +237,14 @@ void draw_lines_xy(const int *lines, int x, int y, int color) {
     int points[100];
     int points_count = 0;
     
-    if (game_colour == BLACK) x += 10*SCALE;
-
+    // Offset fixes
+    if (game_colour == BLACK) {
+        x += HSPACING/2-2;
+    }
+    else {
+        x += 4;
+    }
+    
     points[points_count++] = x;
     points[points_count++] = y;
 
@@ -250,8 +264,8 @@ void draw_lines_xy(const int *lines, int x, int y, int color) {
 
         lines++;
 
-        points[points_count++] = yOff;
-        points[points_count++] = xOff;
+        points[points_count++] = yOff*RENDER_SCALE;
+        points[points_count++] = xOff*RENDER_SCALE;
     }
 }
 
@@ -361,7 +375,8 @@ void choose_from_move() {
         game_to_x = game_from_x;
         game_to_y = game_from_y;
 
-        game_state = PLAYER_CHOOSE_TO;
+        game_change_state(PLAYER_CHOOSE_TO);
+
         platform_input_wait();
         build_last_user_position();
     }
@@ -398,7 +413,8 @@ void choose_to_move() {
     }
     
     if (platform_button_is_pressed(BUTTON_FOUR)) {
-        game_state = PLAYER_MOVE;
+        game_change_state(PLAYER_MOVE);
+
         platform_input_wait();
         build_last_user_position();
     }
@@ -422,7 +438,7 @@ void draw_computer_move() {
 
 void wait_for_begin() {
     if (platform_button_is_pressed(BUTTON_FOUR)) {
-        game_state = GAME_START;
+        game_change_state(GAME_START);
         platform_input_wait();
     }
 }
@@ -525,7 +541,7 @@ void animate_player() {
     animate_piece();
     
     if (animation_counter >= animation_time) {
-        game_state = PLAYER_ANIMATE_END;
+        game_change_state(PLAYER_ANIMATE_END);
     }
     else {
         animation_counter++;
@@ -536,7 +552,7 @@ void animate_computer() {
     animate_piece();
 
     if (animation_counter >= animation_time) {
-        game_state = COMPUTER_ANIMATE_END;
+        game_change_state(COMPUTER_ANIMATE_END);
     }
     else {
         animation_counter++;
@@ -552,7 +568,7 @@ void* threadFunction(void* args) {
 
     chess_last_move(&game_comp_from_x, &game_comp_from_y, &game_comp_to_x, &game_comp_to_y);
     
-    game_state = COMPUTER_MOVED;
+    game_change_state(COMPUTER_MOVED);
 
     return 0;
 }
@@ -566,7 +582,7 @@ void computer_move() {
     if (ret == 0) {
     	printf("Thinking thread created successfully.\n");
 
-        game_state = COMPUTER_THINK;
+        game_change_state(COMPUTER_THINK);
         sprintf(comp_info, "THINKING");
     }
     else {
@@ -608,12 +624,17 @@ void init_board() {
     
     chess_initialize();
     
-    game_state = GAME_INITIALIZE;
+    game_change_state(GAME_INITIALIZE);
 
     update_board();
 }
 
 // MARK: - Game loop
+
+void game_change_state(int to_state) {
+    printf("Change game state from '%s' to '%s'\n", states[game_state], states[to_state]);
+    game_state = to_state;
+}
 
 boolean game_win() {
     return false;
@@ -652,7 +673,7 @@ boolean game_frame(void) {
             build_last_computer_position();
             animation_counter = 0;
             animation_time = distance() * ANIMATION_TIME;
-            game_state = COMPUTER_ANIMATE;
+            game_change_state(COMPUTER_ANIMATE);
             break;
         case COMPUTER_ANIMATE:
             animate_computer();
@@ -665,10 +686,10 @@ boolean game_frame(void) {
             update_board();
             
             if (game_win()) {
-                game_state = GAME_END;
+                game_change_state(GAME_END);
             }
             else {
-                game_state = PLAYER_CHOOSE_FROM;
+                game_change_state(PLAYER_CHOOSE_FROM);
             }
             break;
         case PLAYER_CHOOSE_FROM:
@@ -685,14 +706,15 @@ boolean game_frame(void) {
             if (user_move()) {
                 animation_counter = 0;
                 animation_time = distance() * ANIMATION_TIME;
-                game_state = PLAYER_ANIMATE;
+                game_change_state(PLAYER_ANIMATE);
             }
             else {
                 sprintf(player_info, "ILLEGAL MOVE");
                 
                 game_from_x = 0; game_from_y = 0;
                 game_to_x = 0; game_to_y = 0;
-                game_state = PLAYER_CHOOSE_FROM;
+                
+                game_change_state(PLAYER_CHOOSE_FROM);
             }
             break;
         case PLAYER_ANIMATE:
@@ -702,7 +724,7 @@ boolean game_frame(void) {
             update_board();
 
             if (game_win()) {
-                game_state = GAME_END;
+                game_change_state(GAME_END);
             }
             else {
                 computer_move();

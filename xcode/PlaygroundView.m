@@ -55,6 +55,7 @@ int  v_printStringRaster(int8_t x, int8_t y, char* str, int8_t xSize, int8_t ySi
 - (void)setRenderSize:(int)width height:(int)height {
     render_width = width;
     render_height = height;
+    fb_init();
 }
 
 - (void)render:(NSImage *)image {
@@ -217,7 +218,7 @@ void fb_init(void) {
         pixel_buffer = NULL;
     }
     
-    printf("Create tender buffer %dx%d\n", render_width, render_height);
+    printf("Create render buffer %dx%d\n", render_width, render_height);
     
     pixel_buffer = (unsigned char *)malloc(render_width * render_height * 4);
 }
@@ -252,10 +253,6 @@ void fb_draw_line(int x1, int y1, int x2, int y2, int color, int invert) {
     if (invert) {
         y1 = render_height-y1;
         y2 = render_height-y2;
-    }
-    
-    if (y1 > 400 || y2 > 400) {
-        printf("bigger");
     }
     
     int dx = x2 - x1;

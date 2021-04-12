@@ -557,200 +557,202 @@ static int generate_moves(int current_side, MOVE * pBuf) {
 // Gen all captures of current_side to move and push them to pBuf, return number of moves
 // It's necesary at least ir order to use quiescent in the ab_search
 static int generate_captures(int current_side, MOVE * pBuf) {
-  int i;
-  int k;
-  int y;
-  int row;
-  int col;
-  int capscount;        /* Counter for the posible captures */
-  int xside;
-  xside = (WHITE + BLACK) - current_side;
-  capscount = 0;
+    int i;
+    int k;
+    int y;
+    int row;
+    int col;
+    int capscount;
+    int xside;
+    xside = (WHITE + BLACK) - current_side;
+    capscount = 0;
 
-  for (i = 0; i < 64; i++)    /* Scan all board */
-    if (color[i] == current_side)
-      {
-    switch (piece[i])
-      {
+    for (i = 0; i < 64; i++) {
+        if (color[i] == current_side) {
+            switch (piece[i])   {
+                case PAWN:
+                    col = COL (i);
+                    row = ROW (i);
+                    if (current_side == BLACK) {
+                        // This isn't a capture, but it's necesary in order to * not oversee promotions
+                        if (row > 7 && color[i + 8] == EMPTY)
+                            /* Pawn advances one square.
+                             * We use generate_push_pawn because it can be a promotion */
+                            generate_push_pawn (i, i + 8, pBuf, &capscount);
+                    
+                        if (col && color[i + 7] == WHITE)
+                            /* Pawn captures and it can be a promotion */
+                            generate_push_pawn (i, i + 7, pBuf, &capscount);
+                    
+                        if (col < 7 && color[i + 9] == WHITE)
+                            /* Pawn captures and can be a promotion */
+                            generate_push_pawn (i, i + 9, pBuf, &capscount);
+                    
+                        /* For en passant capture */
+                        if (col && piece[i + 7] == EPS_SQUARE)
+                            /* Pawn captures and it can be a promotion */
+                            generate_push_pawn (i, i + 7, pBuf, &capscount);
+                    
+                        if (col < 7 && piece[i + 9] == EPS_SQUARE)
+                            /* Pawn captures and can be a promotion */
+                            generate_push_pawn (i, i + 9, pBuf, &capscount);
+                    }
+                    else if (current_side == WHITE) {
+                        if (row < 2 && color[i - 8] == EMPTY)
+                            /* This isn't a capture, but it's necesary in order to * not oversee promotions */
+                            generate_push_pawn (i, i - 8, pBuf, &capscount);
+                    
+                        /* For captures */
+                        if (col && color[i - 9] == BLACK)
+                            generate_push_pawn (i, i - 9, pBuf, &capscount);
+                    
+                        if (col < 7 && color[i - 7] == BLACK)
+                            generate_push_pawn (i, i - 7, pBuf, &capscount);
+                    
+                        /* For en passant capture */
+                        if (col && piece[i - 9] == EPS_SQUARE)
+                            generate_push_pawn (i, i - 9, pBuf, &capscount);
+                    
+                        if (col < 7 && piece[i - 7] == EPS_SQUARE)
+                            generate_push_pawn (i, i - 7, pBuf, &capscount);
+                    }
+                    break;
 
-      case PAWN:
-        col = COL (i);
-        row = ROW (i);
-        if (current_side == BLACK)
-          {
-        /* This isn't a capture, but it's necesary in order to
-         * not oversee promotions */
-        if (row > 7 && color[i + 8] == EMPTY)
-          /* Pawn advances one square.
-           * We use generate_push_pawn because it can be a promotion */
-          generate_push_pawn (i, i + 8, pBuf, &capscount);
-        if (col && color[i + 7] == WHITE)
-          /* Pawn captures and it can be a promotion */
-          generate_push_pawn (i, i + 7, pBuf, &capscount);
-        if (col < 7 && color[i + 9] == WHITE)
-          /* Pawn captures and can be a promotion */
-          generate_push_pawn (i, i + 9, pBuf, &capscount);
-        /* For en passant capture */
-        if (col && piece[i + 7] == EPS_SQUARE)
-          /* Pawn captures and it can be a promotion */
-          generate_push_pawn (i, i + 7, pBuf, &capscount);
-        if (col < 7 && piece[i + 9] == EPS_SQUARE)
-          /* Pawn captures and can be a promotion */
-          generate_push_pawn (i, i + 9, pBuf, &capscount);
-          }
-        else if (current_side == WHITE)
-          {
-        if (row < 2 && color[i - 8] == EMPTY)
-          /* This isn't a capture, but it's necesary in order to
-           * not oversee promotions */
-          generate_push_pawn (i, i - 8, pBuf, &capscount);
-        /* For captures */
-        if (col && color[i - 9] == BLACK)
-          generate_push_pawn (i, i - 9, pBuf, &capscount);
-        if (col < 7 && color[i - 7] == BLACK)
-          generate_push_pawn (i, i - 7, pBuf, &capscount);
-        /* For en passant capture */
-        if (col && piece[i - 9] == EPS_SQUARE)
-          generate_push_pawn (i, i - 9, pBuf, &capscount);
-        if (col < 7 && piece[i - 7] == EPS_SQUARE)
-          generate_push_pawn (i, i - 7, pBuf, &capscount);
-          }
-        break;
+                case KNIGHT:
+                    col = COL (i);
+                    y = i - 6;
+                    if (y >= 0 && col < 6 && color[y] == xside)
+                    generate_push_normal (i, y, pBuf, &capscount);
+                    y = i - 10;
+                    if (y >= 0 && col > 1 && color[y] == xside)
+                    generate_push_normal (i, y, pBuf, &capscount);
+                    y = i - 15;
+                    if (y >= 0 && col < 7 && color[y] == xside)
+                    generate_push_normal (i, y, pBuf, &capscount);
+                    y = i - 17;
+                    if (y >= 0 && col > 0 && color[y] == xside)
+                    generate_push_normal (i, y, pBuf, &capscount);
+                    y = i + 6;
+                    if (y < 64 && col > 1 && color[y] == xside)
+                    generate_push_normal (i, y, pBuf, &capscount);
+                    y = i + 10;
+                    if (y < 64 && col < 6 && color[y] == xside)
+                    generate_push_normal (i, y, pBuf, &capscount);
+                    y = i + 15;
+                    if (y < 64 && col > 0 && color[y] == xside)
+                    generate_push_normal (i, y, pBuf, &capscount);
+                    y = i + 17;
+                    if (y < 64 && col < 7 && color[y] == xside)
+                    generate_push_normal (i, y, pBuf, &capscount);
+                    break;
 
-      case KNIGHT:
-        col = COL (i);
-        y = i - 6;
-        if (y >= 0 && col < 6 && color[y] == xside)
-          generate_push_normal (i, y, pBuf, &capscount);
-        y = i - 10;
-        if (y >= 0 && col > 1 && color[y] == xside)
-          generate_push_normal (i, y, pBuf, &capscount);
-        y = i - 15;
-        if (y >= 0 && col < 7 && color[y] == xside)
-          generate_push_normal (i, y, pBuf, &capscount);
-        y = i - 17;
-        if (y >= 0 && col > 0 && color[y] == xside)
-          generate_push_normal (i, y, pBuf, &capscount);
-        y = i + 6;
-        if (y < 64 && col > 1 && color[y] == xside)
-          generate_push_normal (i, y, pBuf, &capscount);
-        y = i + 10;
-        if (y < 64 && col < 6 && color[y] == xside)
-          generate_push_normal (i, y, pBuf, &capscount);
-        y = i + 15;
-        if (y < 64 && col > 0 && color[y] == xside)
-          generate_push_normal (i, y, pBuf, &capscount);
-        y = i + 17;
-        if (y < 64 && col < 7 && color[y] == xside)
-          generate_push_normal (i, y, pBuf, &capscount);
-        break;
+                case QUEEN:        /* == BISHOP+ROOK */
+                case BISHOP:
+                    for (y = i - 9; y >= 0 && COL (y) != 7; y -= 9)
+                    {            /* go left up */
+                    if (color[y] != EMPTY)
+                    {
+                    if (color[y] != current_side)
+                    generate_push_normal (i, y, pBuf, &capscount);
+                    break;
+                    }
+                    }
+                    for (y = i - 7; y >= 0 && COL (y) != 0; y -= 7)
+                    {            /* go right up */
+                    if (color[y] != EMPTY)
+                    {
+                    if (color[y] != current_side)
+                    generate_push_normal (i, y, pBuf, &capscount);
+                    break;
+                    }
+                    }
+                    for (y = i + 9; y < 64 && COL (y) != 0; y += 9)
+                    {            /* go right down */
+                    if (color[y] != EMPTY)
+                    {
+                    if (color[y] != current_side)
+                    generate_push_normal (i, y, pBuf, &capscount);
+                    break;
+                    }
+                    }
+                    for (y = i + 7; y < 64 && COL (y) != 7; y += 7)
+                    {            /* go left down */
+                    if (color[y] != EMPTY)
+                    {
+                    if (color[y] != current_side)
+                    generate_push_normal (i, y, pBuf, &capscount);
+                    break;
+                    }
+                    }
+                    if (piece[i] == BISHOP)    /* In the case of the bishop we're done */
+                    break;
 
-      case QUEEN:        /* == BISHOP+ROOK */
+                /* FALL THROUGH FOR QUEEN {I meant to do that!} ;-) */
+                case ROOK:
+                    col = COL (i);
+                    for (k = i - col, y = i - 1; y >= k; y--)
+                    {            /* go left */
+                    if (color[y] != EMPTY)
+                    {
+                    if (color[y] != current_side)
+                    generate_push_normal (i, y, pBuf, &capscount);
+                    break;
+                    }
+                    }
+                    for (k = i - col + 7, y = i + 1; y <= k; y++)
+                    {            /* go right */
+                    if (color[y] != EMPTY)
+                    {
+                    if (color[y] != current_side)
+                    generate_push_normal (i, y, pBuf, &capscount);
+                    break;
+                    }
+                    }
+                    for (y = i - 8; y >= 0; y -= 8)
+                    {            /* go up */
+                    if (color[y] != EMPTY)
+                    {
+                    if (color[y] != current_side)
+                    generate_push_normal (i, y, pBuf, &capscount);
+                    break;
+                    }
+                    }
+                    for (y = i + 8; y < 64; y += 8)
+                    {            /* go down */
+                    if (color[y] != EMPTY)
+                    {
+                    if (color[y] != current_side)
+                    generate_push_normal (i, y, pBuf, &capscount);
+                    break;
+                    }
+                    }
+                    break;
 
-      case BISHOP:
-        for (y = i - 9; y >= 0 && COL (y) != 7; y -= 9)
-          {            /* go left up */
-        if (color[y] != EMPTY)
-          {
-            if (color[y] != current_side)
-              generate_push_normal (i, y, pBuf, &capscount);
-            break;
-          }
-          }
-        for (y = i - 7; y >= 0 && COL (y) != 0; y -= 7)
-          {            /* go right up */
-        if (color[y] != EMPTY)
-          {
-            if (color[y] != current_side)
-              generate_push_normal (i, y, pBuf, &capscount);
-            break;
-          }
-          }
-        for (y = i + 9; y < 64 && COL (y) != 0; y += 9)
-          {            /* go right down */
-        if (color[y] != EMPTY)
-          {
-            if (color[y] != current_side)
-              generate_push_normal (i, y, pBuf, &capscount);
-            break;
-          }
-          }
-        for (y = i + 7; y < 64 && COL (y) != 7; y += 7)
-          {            /* go left down */
-        if (color[y] != EMPTY)
-          {
-            if (color[y] != current_side)
-              generate_push_normal (i, y, pBuf, &capscount);
-            break;
-          }
-          }
-        if (piece[i] == BISHOP)    /* In the case of the bishop we're done */
-          break;
+                case KING:
+                    // the column and rank checks are to make sure it is on the board
+                    col = COL (i);
+                    if (col && color[i - 1] == xside)
+                    generate_push_king (i, i - 1, pBuf, &capscount);    /* left */
+                    if (col < 7 && color[i + 1] == xside)
+                    generate_push_king (i, i + 1, pBuf, &capscount);    /* right */
+                    if (i > 7 && color[i - 8] == xside)
+                    generate_push_king (i, i - 8, pBuf, &capscount);    /* up */
+                    if (i < 56 && color[i + 8] == xside)
+                    generate_push_king (i, i + 8, pBuf, &capscount);    /* down */
+                    if (col && i > 7 && color[i - 9] == xside)
+                    generate_push_king (i, i - 9, pBuf, &capscount);    /* left up */
+                    if (col < 7 && i > 7 && color[i - 7] == xside)
+                    generate_push_king (i, i - 7, pBuf, &capscount);    /* right up */
+                    if (col && i < 56 && color[i + 7] == xside)
+                    generate_push_king (i, i + 7, pBuf, &capscount);    /* left down */
+                    if (col < 7 && i < 56 && color[i + 9] == xside)
+                    generate_push_king (i, i + 9, pBuf, &capscount);    /* right down */
+                    break;
+                }
+        }
+    }
 
-        /* FALL THROUGH FOR QUEEN {I meant to do that!} ;-) */
-      case ROOK:
-        col = COL (i);
-        for (k = i - col, y = i - 1; y >= k; y--)
-          {            /* go left */
-        if (color[y] != EMPTY)
-          {
-            if (color[y] != current_side)
-              generate_push_normal (i, y, pBuf, &capscount);
-            break;
-          }
-          }
-        for (k = i - col + 7, y = i + 1; y <= k; y++)
-          {            /* go right */
-        if (color[y] != EMPTY)
-          {
-            if (color[y] != current_side)
-              generate_push_normal (i, y, pBuf, &capscount);
-            break;
-          }
-          }
-        for (y = i - 8; y >= 0; y -= 8)
-          {            /* go up */
-        if (color[y] != EMPTY)
-          {
-            if (color[y] != current_side)
-              generate_push_normal (i, y, pBuf, &capscount);
-            break;
-          }
-          }
-        for (y = i + 8; y < 64; y += 8)
-          {            /* go down */
-        if (color[y] != EMPTY)
-          {
-            if (color[y] != current_side)
-              generate_push_normal (i, y, pBuf, &capscount);
-            break;
-          }
-          }
-        break;
-
-      case KING:
-        // the column and rank checks are to make sure it is on the board
-        col = COL (i);
-        if (col && color[i - 1] == xside)
-          generate_push_king (i, i - 1, pBuf, &capscount);    /* left */
-        if (col < 7 && color[i + 1] == xside)
-          generate_push_king (i, i + 1, pBuf, &capscount);    /* right */
-        if (i > 7 && color[i - 8] == xside)
-          generate_push_king (i, i - 8, pBuf, &capscount);    /* up */
-        if (i < 56 && color[i + 8] == xside)
-          generate_push_king (i, i + 8, pBuf, &capscount);    /* down */
-        if (col && i > 7 && color[i - 9] == xside)
-          generate_push_king (i, i - 9, pBuf, &capscount);    /* left up */
-        if (col < 7 && i > 7 && color[i - 7] == xside)
-          generate_push_king (i, i - 7, pBuf, &capscount);    /* right up */
-        if (col && i < 56 && color[i + 7] == xside)
-          generate_push_king (i, i + 7, pBuf, &capscount);    /* left down */
-        if (col < 7 && i < 56 && color[i + 9] == xside)
-          generate_push_king (i, i + 9, pBuf, &capscount);    /* right down */
-        break;
-      }
-      }
-  return capscount;
+    return capscount;
 }
 
 // Evaluation for current position

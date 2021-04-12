@@ -90,5 +90,6 @@ int chess_main(void);
 @end
 
 void platform_set_size(int width, int height) {
-    [AppDelegate setSize:width height:height];
+    int size = MAX(width, height);
+    [AppDelegate setSize:size height:size];
 }
