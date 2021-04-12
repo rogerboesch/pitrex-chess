@@ -5,8 +5,6 @@
 #include <string.h>
 #include <pthread.h>
 
-int test = 0;
-
 // MARK: -  Chess engine calls
 
 void chess_last_move(int* from_col, int* from_row, int* to_col, int* to_row);
@@ -17,12 +15,14 @@ void chess_initialize(void);
 
 // MARK: - Graphic assets
 
-#define SCREEN_WIDTH 362
-#define SCREEN_HEIGHT 482
-#define TOPMARGIN 0 // (SCREEN_HEIGHT-SCREEN_WIDTH)/2+1
-#define LEFTMARGIN 1
-#define INFO_LINE_1 125
-#define INFO_LINE_2 105
+#define SCREEN_WIDTH    362
+#define SCREEN_HEIGHT   482
+#define TOPMARGIN       0 // (SCREEN_HEIGHT-SCREEN_WIDTH)/2+1
+#define LEFTMARGIN      1
+#define INFO_LINE_1     125
+#define INFO_LINE_2     105
+#define INFO_RIGHT      50
+#define INFO_LEFT       128
 
 #define HSPACING SCREEN_WIDTH/8
 #define VSPACING SCREEN_WIDTH/8
@@ -191,8 +191,8 @@ int animation_time = 0;
 // MARK: - drawing helpers
 
 void draw_rect(int row, int col, int color) {
-    int x = LEFTMARGIN + col * HSPACING - 12;
-    int y = TOPMARGIN + row * VSPACING - 8;
+    int x = LEFTMARGIN + col * HSPACING;
+    int y = TOPMARGIN + row * VSPACING;
 
     // Temporary solution
     int points[5*2];
@@ -217,8 +217,8 @@ void draw_rect(int row, int col, int color) {
 }
 
 void draw_marker(int row, int col, int color) {
-    int x = LEFTMARGIN + col * HSPACING - 12;
-    int y = TOPMARGIN + row * VSPACING - 8;
+    int x = LEFTMARGIN + col * HSPACING;
+    int y = TOPMARGIN + row * VSPACING;
 
     // Temporary solution
     int points[4*2];
@@ -241,12 +241,16 @@ void draw_lines_xy(const int *lines, int x, int y, int color) {
     int points[100];
     int points_count = 0;
     
+    // Should remove this magic numbers later, also the diff betweenn blacl/white
+    y += 6;
+    x += 10;
+    
     // Offset fixes
     if (game_colour == BLACK) {
-        x += HSPACING/2-2;
+        x += HSPACING/2;
     }
     else {
-        x += 4;
+        x += 6;
     }
     
     points[points_count++] = x;
@@ -333,13 +337,13 @@ void update_board() {
 
 void draw_grid() {
     for (int row = 0; row < 9; row++) {
-        int y = TOPMARGIN + row * VSPACING-8;
-        platform_draw_line(LEFTMARGIN-12, y, LEFTMARGIN+8*HSPACING-12, y, LOWLIGHT_COLOR);
+        int y = TOPMARGIN + row * VSPACING;
+        platform_draw_line(LEFTMARGIN, y, LEFTMARGIN+8*HSPACING, y, LOWLIGHT_COLOR);
     }
     
     for (int col = 0; col < 9; col++) {
-        int x = LEFTMARGIN + col * HSPACING-12;
-        platform_draw_line(x, TOPMARGIN-8, x, TOPMARGIN+8*VSPACING-8, LOWLIGHT_COLOR);
+        int x = LEFTMARGIN + col * HSPACING;
+        platform_draw_line(x, TOPMARGIN, x, TOPMARGIN+8*VSPACING, LOWLIGHT_COLOR);
     }
 }
 
@@ -347,8 +351,6 @@ void draw_grid() {
 
 void choose_from_move() {
     if (platform_input_is_down()) {
-test++;
-
         if (game_from_y > 0) {
             game_from_y--;
             platform_input_wait();
@@ -356,7 +358,6 @@ test++;
         }
     }
     if (platform_input_is_up()) {
-test--;
         if (game_from_y < 7) {
             game_from_y++;
             platform_input_wait();
@@ -476,23 +477,18 @@ void build_last_computer_position() {
 }
 
 void display_computer_info() {
-    platform_msg(comp_move_str, 50, INFO_LINE_1, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+    platform_msg(comp_move_str, INFO_RIGHT, INFO_LINE_1, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
 
     if (strlen(comp_info) > 0) {
-        platform_msg(comp_info, 50, INFO_LINE_2, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+        platform_msg(comp_info, INFO_RIGHT, INFO_LINE_2, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
     }
 }
 
 void display_user_info() {
-char temp[256];
-sprintf(temp, "%d", test);
-
-    platform_msg(temp, test, 0, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
-
-    platform_msg(player_move_str, 128, INFO_LINE_1, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+    platform_msg(player_move_str, INFO_LEFT, INFO_LINE_1, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
 
     if (strlen(player_info) > 0) {
-        platform_msg(player_info, 128, INFO_LINE_2, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+        platform_msg(player_info, INFO_LEFT, INFO_LINE_2, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
     }
 }
 
