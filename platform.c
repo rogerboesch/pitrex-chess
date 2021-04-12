@@ -18,7 +18,9 @@
 int currentButtonState = 0;
 int currentJoy1X = 0;
 int currentJoy1Y = 0;
-int usePipeline = 1;
+static int usePipeline = 1;
+static int screen_width = 0;
+static int screen_height = 0;
 
 #define CLIP true
 #define NO_CLIP false
@@ -34,7 +36,7 @@ void v_WaitRecal(void);
 void v_readButtons(void);
 void v_readJoystick1Analog(void);
 
-void v_window(int left, int bottom, int right, int top, boolean clipping) { platform_set_size(right-left, top-bottom); }
+void v_window(int left, int bottom, int right, int top, boolean clipping) { platform_set_size(right-left, top-bottom); screen_width = right-left; screen_height = top-bottom; }
 void v_directDraw32(int x1, int y1, int x2, int y2, int color);
 void v_printString(int x, int y, char* str, int textSize, int color);
 int  v_printStringRaster(int8_t x, int8_t y, char* str, int8_t xSize, int8_t ySize, unsigned char delimiter);
@@ -180,9 +182,9 @@ void platform_draw_line(int x1, int y1, int x2, int y2, int color) {
     // int yy2 = MAX_DAC * y2 / 400 - DAC;
 
     // v_directDraw32(xx1, yy1, xx2, yy2, color);
-	v_line(x1, y1, x2, y2, color);
+	v_line(screen_width-x1, y1, screen_width-x2, y2, color);
 #else
-    v_directDraw32(x1, y1, x2, y2, color);
+    v_directDraw32(screen_width-x1, y1, screen_width-x2, y2, color);
 #endif
 }
 

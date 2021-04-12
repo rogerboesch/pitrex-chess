@@ -3,6 +3,8 @@
 This is an early stage and "brute force" port of chess to the PiTrex. 
 Next steps are:
 
+- Use v_window and remove conversion to DAC coordinates [04-12-21]
+- Organise playfield in *top area info* | *playfield* 
 - Visual feedback of wrong moves [04-11-21]
 - UI shows now last move of player AND computer [04-11-21]
 - Animated movements of the chess figures [04-09-21]
@@ -12,16 +14,11 @@ Next steps are:
 
 
 TODO:
-
-Windowing:
-- Use v_window and remove conversion to DAC coordinates
-- Organise playfield in *top area info* | *playfield* | *bottom area info*
+- Different optimisations (as Y fix)
 
 UI:
 - Visual feedback of check
 - Visual feedback of check mate
-- Different optimisations
-- Using PiTrex window system
 
 Chess:
 - Change of side in game
