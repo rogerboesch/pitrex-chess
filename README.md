@@ -3,6 +3,7 @@
 This is an early stage and "brute force" port of chess to the PiTrex. 
 Next steps are:
 
+- Baremetal support added, thanks Malban! [04-12-21]
 - Use v_window and remove conversion to DAC coordinates [04-12-21]
 - Organise playfield in *top area info* | *playfield* 
 - Visual feedback of wrong moves [04-11-21]
