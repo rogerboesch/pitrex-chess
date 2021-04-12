@@ -502,8 +502,13 @@ void display_msg(char* msg1, char* msg2) {
 
 // MARK: - Animate figure
 
-int distance() {
+int distance_player() {
     int dist = abs(game_to_y - game_from_y) + abs(game_to_x - game_from_x);
+    return dist;
+}
+
+int distance_computer() {
+    int dist = abs(game_comp_to_y - game_comp_from_y) + abs(game_comp_to_x - game_comp_from_x);
     return dist;
 }
 
@@ -512,8 +517,8 @@ int lerp(int a, int b, int time, int duration) {
     return r;
 }
 
-void animate_piece() {
-    int index = game_board[game_from_y][game_from_x];
+void animate_piece(int from_row, int from_col, int to_row, int to_col) {
+    int index = game_board[from_row][from_col];
     if (index == 0) {
         // Empty board cell
         return;
@@ -528,10 +533,10 @@ void animate_piece() {
         draw_color = HIGHLIGHT_COLOR;
     }
 
-    int x1 = LEFTMARGIN + game_from_x * HSPACING;
-    int y1 = TOPMARGIN  + game_from_y * VSPACING;
-    int x2 = LEFTMARGIN + game_to_x * HSPACING;
-    int y2 = TOPMARGIN  + game_to_y * VSPACING;
+    int x1 = LEFTMARGIN + from_col * HSPACING;
+    int y1 = TOPMARGIN  + from_row * VSPACING;
+    int x2 = LEFTMARGIN + to_col * HSPACING;
+    int y2 = TOPMARGIN  + to_row * VSPACING;
     
     int x = x1;
     int y = y1;
@@ -548,7 +553,7 @@ void animate_piece() {
 }
 
 void animate_player() {
-    animate_piece();
+    animate_piece(game_from_y, game_from_x, game_to_y, game_to_x);
     
     if (animation_counter >= animation_time) {
         game_change_state(PLAYER_ANIMATE_END);
@@ -559,7 +564,7 @@ void animate_player() {
 }
 
 void animate_computer() {
-    animate_piece();
+    animate_piece(game_comp_from_y, game_comp_from_x, game_comp_to_y, game_comp_to_x);
 
     if (animation_counter >= animation_time) {
         game_change_state(COMPUTER_ANIMATE_END);
@@ -683,7 +688,7 @@ boolean game_frame(void) {
             build_last_user_position();
             build_last_computer_position();
             animation_counter = 0;
-            animation_time = distance() * ANIMATION_TIME;
+            animation_time = distance_computer() * ANIMATION_TIME;
             game_change_state(COMPUTER_ANIMATE);
             break;
         case COMPUTER_ANIMATE:
@@ -716,7 +721,7 @@ boolean game_frame(void) {
         case PLAYER_MOVE:
             if (user_move()) {
                 animation_counter = 0;
-                animation_time = distance() * ANIMATION_TIME;
+                animation_time = distance_player() * ANIMATION_TIME;
                 game_change_state(PLAYER_ANIMATE);
             }
             else {
