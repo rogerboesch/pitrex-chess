@@ -1,9 +1,9 @@
 # Chess makefile
 BUILD_DIR := build/
-PITREX_DIR := ../../pitrex/pitrex/pitrex/
-VECTREX_DIR := ../../pitrex/pitrex/vectrex/
+PITREX_DIR := ../pitrex/pitrex/pitrex/
+VECTREX_DIR := ../pitrex/pitrex/vectrex/
 SETTINGS := /opt/pitrex/settings
-CFLAGS := -g -I../../pitrex/pitrex/ -DSETTINGS_DIR="\"$(SETTINGS)\"" -DAVOID_TICKS -DPIZERO -DRPI0 -DPITREX -lpthread
+CFLAGS := -g -I../pitrex/pitrex/ -DSETTINGS_DIR="\"$(SETTINGS)\"" -DAVOID_TICKS -DPIZERO -DRPI0 -DPITREX -lpthread
 # CFLAGS := -Ofast -I../pitrex/ -DPIZERO -DRPI0
 CC := gcc
 
