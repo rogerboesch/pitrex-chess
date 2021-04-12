@@ -22,6 +22,7 @@ void chess_initialize(void);
 #define INFO_LINE_1     125
 #define INFO_LINE_2     105
 #define INFO_RIGHT      50
+#define INFO_CENTRE		90
 #define INFO_LEFT       128
 
 #define HSPACING SCREEN_WIDTH/8
@@ -493,7 +494,7 @@ void display_user_info() {
 }
 
 void display_msg(char* msg) {
-    platform_msg(msg, -100, 0, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+    platform_msg(msg, INFO_LEFT, INFO_LINE_2, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
 }
 
 // MARK: - Animate figure
