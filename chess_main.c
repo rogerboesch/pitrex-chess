@@ -35,6 +35,8 @@ void chess_initialize(void);
 #define BLACK_OFFSET 10
 #define HORIZ "ABCDEFGH"
 
+#define PRG_NAME "CHESS 0.3 BY ROGER BOESCH"
+
 const int pawn[] = {
     -1,0*SCALE,-10*SCALE,
 
@@ -493,8 +495,9 @@ void display_user_info() {
     }
 }
 
-void display_msg(char* msg) {
-    platform_msg(msg, INFO_LEFT, INFO_LINE_2, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+void display_msg(char* msg1, char* msg2) {
+    platform_msg(msg1, INFO_LEFT, INFO_LINE_1, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+    platform_msg(msg2, INFO_LEFT, INFO_LINE_2, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
 }
 
 // MARK: - Animate figure
@@ -668,7 +671,7 @@ boolean game_frame(void) {
     switch (game_state) {
         case GAME_INITIALIZE:
             wait_for_begin();
-            display_msg("PRESS BUTTON TO START");
+            display_msg(PRG_NAME, "PRESS BUTTON TO START");
             break;
         case GAME_START:
             computer_move();
@@ -739,7 +742,7 @@ boolean game_frame(void) {
 
             break;
         case GAME_END:
-            display_msg("GAME ENDED");
+            display_msg("GAME ENDED", "");
             break;
     }
 
