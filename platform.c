@@ -58,7 +58,7 @@ void platform_init(char* name, int width, int height) {
 	usePipeline = 1;
     v_setRefresh(60);
 	v_setBrightness(DEFAULT_COLOR);
-    v_window(0, 0, width, height, CLIP);
+    v_window(0, 0, width, height, false);
 }
 
 void platform_frame(void) {

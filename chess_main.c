@@ -5,6 +5,8 @@
 #include <string.h>
 #include <pthread.h>
 
+int test = 0;
+
 // MARK: -  Chess engine calls
 
 void chess_last_move(int* from_col, int* from_row, int* to_col, int* to_row);
@@ -17,8 +19,10 @@ void chess_initialize(void);
 
 #define SCREEN_WIDTH 362
 #define SCREEN_HEIGHT 482
-#define TOPMARGIN (SCREEN_HEIGHT-SCREEN_WIDTH)/2+1
+#define TOPMARGIN 0 // (SCREEN_HEIGHT-SCREEN_WIDTH)/2+1
 #define LEFTMARGIN 1
+#define INFO_LINE_1 125
+#define INFO_LINE_2 105
 
 #define HSPACING SCREEN_WIDTH/8
 #define VSPACING SCREEN_WIDTH/8
@@ -343,6 +347,8 @@ void draw_grid() {
 
 void choose_from_move() {
     if (platform_input_is_down()) {
+test++;
+
         if (game_from_y > 0) {
             game_from_y--;
             platform_input_wait();
@@ -350,6 +356,7 @@ void choose_from_move() {
         }
     }
     if (platform_input_is_up()) {
+test--;
         if (game_from_y < 7) {
             game_from_y++;
             platform_input_wait();
@@ -469,20 +476,23 @@ void build_last_computer_position() {
 }
 
 void display_computer_info() {
+    platform_msg(comp_move_str, 50, INFO_LINE_1, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+
     if (strlen(comp_info) > 0) {
-        platform_msg(comp_info, 50, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
-    }
-    else {
-        platform_msg(comp_move_str, 50, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+        platform_msg(comp_info, 50, INFO_LINE_2, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
     }
 }
 
 void display_user_info() {
+char temp[256];
+sprintf(temp, "%d", test);
+
+    platform_msg(temp, test, 0, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+
+    platform_msg(player_move_str, 128, INFO_LINE_1, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+
     if (strlen(player_info) > 0) {
-        platform_msg(player_info, -100, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
-    }
-    else {
-        platform_msg(player_move_str, -100, -128, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+        platform_msg(player_info, 128, INFO_LINE_2, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
     }
 }
 
