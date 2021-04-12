@@ -52,7 +52,7 @@ int  v_printStringRaster(int8_t x, int8_t y, char* str, int8_t xSize, int8_t ySi
 
 #pragma mark - Render
 
-- (void)setRenderSize:(int)width height:(int)height {
++ (void)setRenderSize:(int)width height:(int)height {
     render_width = width;
     render_height = height;
     fb_init();
