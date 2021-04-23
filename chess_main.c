@@ -12,9 +12,15 @@
 
 void chess_last_move(int* from_col, int* from_row, int* to_col, int* to_row);
 int chess_piece_at(int row, int col);
+int chess_is_player_in_check(void);
+int chess_is_computer_in_check(void);
+int chess_is_mate(void);
 int chess_user_move(int from, int dest);
-void chess_computer_move(void);
+int chess_computer_move(void);
 void chess_initialize(void);
+
+// MARK: - Callback for remote handling
+void game_handle_remote_request(char* request)  {}
 
 // MARK: - Graphic assets
 
@@ -161,9 +167,9 @@ const int* pieces[8] = {castle, knight, bishop, queen, king, bishop, knight, cas
 const int* piece_type[6] = {pawn, knight, bishop, castle, queen, king};
 
 typedef enum _GAME_STATE {
-    GAME_INITIALIZE, GAME_START, GAME_END,
-    COMPUTER_THINK, COMPUTER_MOVED, COMPUTER_ANIMATE, COMPUTER_ANIMATE_END,
-    PLAYER_CHOOSE_FROM, PLAYER_CHOOSE_TO, PLAYER_MOVE, PLAYER_ANIMATE, PLAYER_ANIMATE_END
+    GAME_INITIALIZE, GAME_START,
+    COMPUTER_THINK, COMPUTER_MOVED, COMPUTER_ANIMATE, COMPUTER_ANIMATE_END, COMPUTER_WIN,
+    PLAYER_CHOOSE_FROM, PLAYER_CHOOSE_TO, PLAYER_MOVE, PLAYER_ANIMATE, PLAYER_ANIMATE_END, PLAYER_WIN
 } GAME_STATE;
 
 const char* states[] = {"initialize", "start", "end",
@@ -176,8 +182,11 @@ const char* states[] = {"initialize", "start", "end",
 void update_board(void);
 void build_last_user_position(void);
 void game_change_state(int to_state);
+void game_start(void);
 
 // MARK: - Game vars
+
+#define ANIMATION_TIME 5
 
 GAME_STATE game_state;
 int game_colour;
@@ -186,7 +195,6 @@ int game_from_x, game_from_y, game_to_x, game_to_y;
 int game_comp_from_x, game_comp_from_y, game_comp_to_x, game_comp_to_y;
 int draw_color = DEFAULT_COLOR;
 
-#define ANIMATION_TIME 5
 char player_move_str[256];
 char player_info[256];
 char comp_move_str[256];
@@ -359,28 +367,24 @@ void choose_from_move() {
     if (platform_input_is_down()) {
         if (game_from_y > 0) {
             game_from_y--;
-            platform_input_wait();
             build_last_user_position();
         }
     }
     if (platform_input_is_up()) {
         if (game_from_y < 7) {
             game_from_y++;
-            platform_input_wait();
             build_last_user_position();
         }
     }
     if (platform_input_is_left()) {
         if (game_from_x > 0) {
             game_from_x--;
-            platform_input_wait();
             build_last_user_position();
         }
     }
     if (platform_input_is_right()) {
         if (game_from_x < 7) {
             game_from_x++;
-            platform_input_wait();
             build_last_user_position();
         }
     }
@@ -391,7 +395,6 @@ void choose_from_move() {
 
         game_change_state(PLAYER_CHOOSE_TO);
 
-        platform_input_wait();
         build_last_user_position();
     }
 }
@@ -400,28 +403,24 @@ void choose_to_move() {
     if (platform_input_is_down()) {
         if (game_to_y > 0) {
             game_to_y--;
-            platform_input_wait();
             build_last_user_position();
         }
     }
     if (platform_input_is_up()) {
         if (game_to_y < 8) {
             game_to_y++;
-            platform_input_wait();
             build_last_user_position();
         }
     }
     if (platform_input_is_left()) {
         if (game_to_x > 0) {
             game_to_x--;
-            platform_input_wait();
             build_last_user_position();
         }
     }
     if (platform_input_is_right()) {
         if (game_to_x < 8) {
             game_to_x++;
-            platform_input_wait();
             build_last_user_position();
         }
     }
@@ -429,7 +428,6 @@ void choose_to_move() {
     if (platform_button_is_pressed(BUTTON_FOUR)) {
         game_change_state(PLAYER_MOVE);
 
-        platform_input_wait();
         build_last_user_position();
     }
 }
@@ -453,7 +451,6 @@ void draw_computer_move() {
 void wait_for_begin() {
     if (platform_button_is_pressed(BUTTON_FOUR)) {
         game_change_state(GAME_START);
-        platform_input_wait();
     }
 }
 
@@ -501,6 +498,20 @@ void display_user_info() {
 void display_msg(char* msg1, char* msg2) {
     platform_msg(msg1, INFO_LEFT, INFO_LINE_1, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
     platform_msg(msg2, INFO_LEFT, INFO_LINE_2, DEFAULT_TEXT_SMALL_SIZE, DEFAULT_COLOR);
+}
+
+void end_game_screen() {
+    if (game_state == COMPUTER_WIN) {
+        display_msg("YOU LOST", "GAME ENDED");
+    }
+    else {
+        display_msg("YOU WIN", "GAME ENDED");
+    }
+    
+    if (platform_button_is_pressed(BUTTON_FOUR)) {
+        // Restart game
+        game_start();
+    }
 }
 
 // MARK: - Animate figure
@@ -592,7 +603,12 @@ void computer_move() {
 
 void* threadFunction(void* args) {
     printf("Start thinking in thread\n");
-    chess_computer_move();
+    if (chess_computer_move() == -2) {
+        // Check mate
+        game_change_state(PLAYER_WIN);
+        return 0;
+    }
+    
     printf("End of thinking in thread\n");
 
     chess_last_move(&game_comp_from_x, &game_comp_from_y, &game_comp_to_x, &game_comp_to_y);
@@ -626,7 +642,35 @@ boolean user_move() {
     int to = game_to_y*8+game_to_x;
 
     int result = chess_user_move(from, to);
+    if (result == -2) {
+        // No move found anymore, mate?
+        game_change_state(COMPUTER_WIN);
+        return false;
+    }
+    
     return result == 0 ? true : false;
+}
+
+// MARK: -Initialisation
+
+void init_vars(void) {
+    game_from_x = 0;
+    game_from_y = 0;
+    game_to_x = 0;
+    game_to_y = 0;
+    game_comp_from_x = 0;
+    game_comp_from_y = 0;
+    game_comp_to_x = 0;
+    game_comp_to_y = 0;
+    draw_color = DEFAULT_COLOR;
+
+    sprintf(player_move_str, "");
+    sprintf(player_info, "");
+    sprintf(comp_move_str, "");
+    sprintf(comp_info, "");
+
+    animation_counter = 0;
+    animation_time = 0;
 }
 
 void init_board() {
@@ -667,24 +711,34 @@ void game_change_state(int to_state) {
     game_state = to_state;
 }
 
-boolean game_win() {
+boolean is_game_finished() {
+    if (chess_is_mate()) {
+        return true;
+    }
+    
+    if (chess_is_player_in_check()) {
+        sprintf(player_info, "CHECK");
+        return false;
+    }
+
+    if (chess_is_computer_in_check()) {
+        sprintf(comp_info, "CHECK");
+        return false;
+    }
+
     return false;
 }
 
 void game_start(void) {
+    init_vars();
     init_board();
 }
 
 void game_stop(void) {
 }
 
-boolean game_frame(void) {
+boolean game_frame() {
     platform_frame();
-    
-    if (platform_button_is_pressed(BUTTON_FOUR)) {
-		// Press all 4 button to stop is implemented in system
-        //return false;
-    }
 
     draw_grid();
     draw_board();
@@ -717,10 +771,7 @@ boolean game_frame(void) {
 
             update_board();
             
-            if (game_win()) {
-                game_change_state(GAME_END);
-            }
-            else {
+            if (!is_game_finished()) {
                 game_change_state(PLAYER_CHOOSE_FROM);
             }
             break;
@@ -741,12 +792,14 @@ boolean game_frame(void) {
                 game_change_state(PLAYER_ANIMATE);
             }
             else {
-                sprintf(player_info, "ILLEGAL MOVE");
-                
-                game_from_x = 0; game_from_y = 0;
-                game_to_x = 0; game_to_y = 0;
-                
-                game_change_state(PLAYER_CHOOSE_FROM);
+                if (game_state == PLAYER_MOVE) {
+                    sprintf(player_info, "ILLEGAL MOVE");
+                    
+                    game_from_x = 0; game_from_y = 0;
+                    game_to_x = 0; game_to_y = 0;
+                    
+                    game_change_state(PLAYER_CHOOSE_FROM);
+                }
             }
             break;
         case PLAYER_ANIMATE:
@@ -755,16 +808,14 @@ boolean game_frame(void) {
         case PLAYER_ANIMATE_END:
             update_board();
 
-            if (game_win()) {
-                game_change_state(GAME_END);
-            }
-            else {
+            if (!is_game_finished()) {
                 computer_move();
             }
 
             break;
-        case GAME_END:
-            display_msg("GAME ENDED", "");
+        case COMPUTER_WIN:
+        case PLAYER_WIN:
+            end_game_screen();
             break;
     }
 
@@ -778,8 +829,9 @@ boolean game_frame(void) {
 #ifdef PITREX
 int main() {
 #else
-int chess_main() {
+int game_main() {
 #endif
+    platform_start_remote_input();
     platform_init("chess", SCREEN_WIDTH, SCREEN_HEIGHT, 50);
     
     game_start();

@@ -8,7 +8,7 @@ Build:
 - Run with ``sudo ./chess``
 
 
-![Chess](assets/chess.png "Logo Title Text 1")
+![Chess](assets/chess.png "Chess")
 
 
 TODO:

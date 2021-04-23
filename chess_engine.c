@@ -57,6 +57,11 @@ unsigned int clock() {
 #define MOVE_TYPE_PROMOTION_TO_BISHOP 7
 #define MOVE_TYPE_PROMOTION_TO_KNIGHT 8
 
+// Move results
+#define MOVE_OK              0
+#define MOVE_NOT_POSSIBLE   -1
+#define MOVE_NONE_AVAILABLE -2      // Mate
+
 // Some useful squares
 #define A1 56
 #define B1 57
@@ -114,6 +119,7 @@ typedef struct tag_MOVE {
     int from;
     int dest;
     int type;
+    int score;
 } MOVE;
 
 typedef struct tag_HIST {
@@ -1440,9 +1446,6 @@ MOVE computer_think(int depth) {
         decimal_score = -decimal_score;
     }
 
-    //printf("Search result: move = %c%d%c%d; depth = %d, score = %.2f, time = %.2fs knps = %.2f\n- countCapCalls = %d\n- countQSearch = %d\n- moves made = %d\n- ratio_Qsearc_Capcalls = %.2f\n",
-    //       'a' + COL (m.from), 8 - ROW (m.from), 'a' + COL (m.dest), 8 - ROW (m.dest), depth, decimal_score, t, knps, count_cap_calls, count_quies_calls, count_MakeMove, ratio_Qsearc_Capcalls);
-
     computer_move_from_x = COL(m.from);
     computer_move_from_y = ROW(m.from);
     computer_move_to_x = COL(m.dest);
@@ -1451,6 +1454,7 @@ MOVE computer_think(int depth) {
     printf("Search: depth = %d, score = %.2f, time = %.2fs\n", depth, decimal_score, t);
     printf("Moved from %d,%d to %d,%d\n", computer_move_from_x, computer_move_from_y, computer_move_to_x, computer_move_to_y);
 
+    m.score = score;
     return m;
 }
 
@@ -1507,6 +1511,18 @@ static void start_game() {
 
 // MARK: - Public functions
 
+int chess_is_player_in_check() {
+    return is_in_check(computer_side == BLACK ? WHITE : BLACK);
+}
+
+int chess_is_computer_in_check() {
+    return is_in_check(computer_side);
+}
+
+int chess_is_mate() {
+    return 0;
+}
+
 int chess_user_move(int from, int dest) {
     ply = 0;
 
@@ -1536,13 +1552,22 @@ int chess_user_move(int from, int dest) {
     return -2;
 }
 
-void chess_computer_move() {
+int chess_computer_move() {
     if (side == computer_side) {
         MOVE bestMove = computer_think(max_depth);
         make_move(bestMove);
 
         print_board();
+        
+        if (bestMove.score >= MATE) {
+            return -2;
+        }
+        else if (bestMove.score == 0) {
+            return -1;
+        }
     }
+    
+    return 0;
 }
 
 int chess_piece_at(int row, int col) {

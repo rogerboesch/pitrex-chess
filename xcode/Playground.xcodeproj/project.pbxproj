@@ -10,10 +10,11 @@
 		DBD9CCF62620283600B3C057 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CCF52620283600B3C057 /* AppDelegate.m */; };
 		DBD9CCFE2620283700B3C057 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CCFD2620283700B3C057 /* main.m */; };
 		DBD9CD0E26202A8D00B3C057 /* PlaygroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CD0D26202A8D00B3C057 /* PlaygroundView.m */; };
-		DBD9CD1926202EBE00B3C057 /* chess_engine.c in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CD1526202EBE00B3C057 /* chess_engine.c */; };
 		DBD9CD1A26202EBE00B3C057 /* platform.c in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CD1726202EBE00B3C057 /* platform.c */; };
-		DBD9CD1B26202EBE00B3C057 /* chess_main.c in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CD1826202EBE00B3C057 /* chess_main.c */; };
-		DBD9CD492623128A00B3C057 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = DBD9CD482623128A00B3C057 /* README.md */; };
+		DBD9CD4D2624705E00B3C057 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = DBD9CD4C2624705E00B3C057 /* README.md */; };
+		DBD9CDB5262D50C300B3C057 /* chess_engine.c in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CDB3262D50C300B3C057 /* chess_engine.c */; };
+		DBD9CDB6262D50C300B3C057 /* chess_main.c in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CDB4262D50C300B3C057 /* chess_main.c */; };
+		DBD9CDBA262D58EB00B3C057 /* rb_server.c in Sources */ = {isa = PBXBuildFile; fileRef = DBD9CDB9262D58EB00B3C057 /* rb_server.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,11 +25,12 @@
 		DBD9CCFD2620283700B3C057 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		DBD9CD0C26202A8D00B3C057 /* PlaygroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaygroundView.h; sourceTree = "<group>"; };
 		DBD9CD0D26202A8D00B3C057 /* PlaygroundView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlaygroundView.m; sourceTree = "<group>"; };
-		DBD9CD1526202EBE00B3C057 /* chess_engine.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = chess_engine.c; path = ../chess_engine.c; sourceTree = "<group>"; };
 		DBD9CD1626202EBE00B3C057 /* platform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = platform.h; path = ../platform.h; sourceTree = "<group>"; };
 		DBD9CD1726202EBE00B3C057 /* platform.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = platform.c; path = ../platform.c; sourceTree = "<group>"; };
-		DBD9CD1826202EBE00B3C057 /* chess_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = chess_main.c; path = ../chess_main.c; sourceTree = "<group>"; };
-		DBD9CD482623128A00B3C057 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		DBD9CD4C2624705E00B3C057 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		DBD9CDB3262D50C300B3C057 /* chess_engine.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = chess_engine.c; path = ../chess_engine.c; sourceTree = "<group>"; };
+		DBD9CDB4262D50C300B3C057 /* chess_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = chess_main.c; path = ../chess_main.c; sourceTree = "<group>"; };
+		DBD9CDB9262D58EB00B3C057 /* rb_server.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rb_server.c; path = ../rb_server.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,8 +47,8 @@
 		DBD9CCE82620283600B3C057 = {
 			isa = PBXGroup;
 			children = (
-				DBD9CD482623128A00B3C057 /* README.md */,
-				DBD9CD1426202EA400B3C057 /* Chess */,
+				DBD9CD4C2624705E00B3C057 /* README.md */,
+				DBD9CD1426202EA400B3C057 /* Game */,
 				DBD9CCF32620283600B3C057 /* Playground */,
 				DBD9CCF22620283600B3C057 /* Products */,
 			);
@@ -73,15 +75,16 @@
 			name = Playground;
 			sourceTree = "<group>";
 		};
-		DBD9CD1426202EA400B3C057 /* Chess */ = {
+		DBD9CD1426202EA400B3C057 /* Game */ = {
 			isa = PBXGroup;
 			children = (
-				DBD9CD1526202EBE00B3C057 /* chess_engine.c */,
-				DBD9CD1826202EBE00B3C057 /* chess_main.c */,
+				DBD9CDB4262D50C300B3C057 /* chess_main.c */,
+				DBD9CDB3262D50C300B3C057 /* chess_engine.c */,
 				DBD9CD1726202EBE00B3C057 /* platform.c */,
 				DBD9CD1626202EBE00B3C057 /* platform.h */,
+				DBD9CDB9262D58EB00B3C057 /* rb_server.c */,
 			);
-			name = Chess;
+			name = Game;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -140,7 +143,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DBD9CD492623128A00B3C057 /* README.md in Resources */,
+				DBD9CD4D2624705E00B3C057 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -154,8 +157,9 @@
 				DBD9CCFE2620283700B3C057 /* main.m in Sources */,
 				DBD9CD1A26202EBE00B3C057 /* platform.c in Sources */,
 				DBD9CD0E26202A8D00B3C057 /* PlaygroundView.m in Sources */,
-				DBD9CD1B26202EBE00B3C057 /* chess_main.c in Sources */,
-				DBD9CD1926202EBE00B3C057 /* chess_engine.c in Sources */,
+				DBD9CDBA262D58EB00B3C057 /* rb_server.c in Sources */,
+				DBD9CDB6262D50C300B3C057 /* chess_main.c in Sources */,
+				DBD9CDB5262D50C300B3C057 /* chess_engine.c in Sources */,
 				DBD9CCF62620283600B3C057 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -279,7 +283,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_ENTITLEMENTS = PitrexPlayground/PitrexPlayground.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -302,7 +306,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_ENTITLEMENTS = PitrexPlayground/PitrexPlayground.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "PITREX_PLAYGROUND=1";

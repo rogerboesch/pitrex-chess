@@ -1,6 +1,7 @@
 
 #import "PlaygroundView.h"
 #import "AppDelegate.h"
+#include "platform.h"
 
 extern int currentButtonState;
 extern int currentJoy1X;
@@ -9,6 +10,7 @@ extern int currentJoy1Y;
 unsigned char* pixel_buffer = NULL;
 int render_width = 400;
 int render_height = 400;
+int line_count = 0;
 
 void fb_init(void);
 void fb_clear(void);
@@ -24,10 +26,10 @@ void fb_draw_string(int x, int y, char* str, int size, int color);
 
 void v_setName(char *name) { [AppDelegate setName:name]; }
 void v_init(void) { fb_init(); }
-void v_WaitRecal(void) { fb_render(); usleep(20*1000); fb_clear(); }
+void v_WaitRecal(void) { fb_render(); usleep(20*1000); fb_clear(); line_count = 0; }
 void v_directMove32(int32_t x, int32_t y) { fb_moveto(x, y); }
-void v_directDeltaDraw32(int32_t x, int32_t y, uint8_t color) { fb_lineby(x, y, color, 1); }
-void v_directDraw32(int x1, int y1, int x2, int y2, int color) { fb_draw_line_set_cursor(x1, y1, x2, y2, color, 1); }
+void v_directDeltaDraw32(int32_t x, int32_t y, uint8_t color) { fb_lineby(x, y, color, 1); line_count++; }
+void v_directDraw32(int x1, int y1, int x2, int y2, int color) { fb_draw_line_set_cursor(x1, y1, x2, y2, color, 1); line_count++; }
 void v_printString(int x, int y, char* str, int textSize, int color) { fb_draw_string(x, y, str, textSize, color); }
 
 // Unimplemenyed calls (dummies)
@@ -38,13 +40,10 @@ void v_readJoystick1Analog(void) {}
 
 int  v_printStringRaster(int8_t x, int8_t y, char* str, int8_t xSize, int8_t ySize, unsigned char delimiter) { return 0; }
 
-
-#define BIT_SET(a,b) ((a) |= (1ULL<<(b)))
-#define BIT_CLEAR(a,b) ((a) &= ~(1ULL<<(b)))
-
 @interface PlaygroundView ()
 
 @property (nonatomic, retain) NSImageView* renderImageView;
+@property (nonatomic, retain) NSTextField* infoField;
 
 @end
 
@@ -58,8 +57,9 @@ int  v_printStringRaster(int8_t x, int8_t y, char* str, int8_t xSize, int8_t ySi
     fb_init();
 }
 
-- (void)render:(NSImage *)image {
+- (void)render:(NSImage *)image lines:(int)lines {
     self.renderImageView.image = image;
+    self.infoField.stringValue = [NSString stringWithFormat:@"lines: %d", lines];
 }
 
 #pragma mark - UI events
@@ -76,66 +76,42 @@ int  v_printStringRaster(int8_t x, int8_t y, char* str, int8_t xSize, int8_t ySi
     return YES;
 }
 
-- (void)keyDown:(NSEvent *)event {
-    NSLog(@"Key down: %d", event.keyCode);
-
-    switch (event.keyCode) {
+- (void)setInputState:(int)keyCode press:(BOOL)press {
+    switch (keyCode) {
         case 123:   // arrrow (left)
-            currentJoy1X = -127;
+            platform_set_control_state(1, press);
             break;
         case 124:   // arrrow (right)
-            currentJoy1X = 127;
+            platform_set_control_state(2, press);
             break;
         case 125:   // arrrow (down)
-            currentJoy1Y = 127;
+            platform_set_control_state(3, press);
             break;
         case 126:   // arrrow (up)
-            currentJoy1Y = -127;
+            platform_set_control_state(4, press);
             break;
         case 18:   // 1
-            BIT_SET(currentButtonState, 0);
+            platform_set_control_state(5, press);
             break;
         case 19:   // 2
-            BIT_SET(currentButtonState, 1);
+            platform_set_control_state(6, press);
             break;
         case 20:   // 3
-            BIT_SET(currentButtonState, 2);
+            platform_set_control_state(7, press);
             break;
         case 21:   // 4
-            BIT_SET(currentButtonState, 3);
+        case 49:   // 4
+            platform_set_control_state(8, press);
             break;
     }
 }
 
+- (void)keyDown:(NSEvent *)event {
+    [self setInputState:event.keyCode press:true];
+}
+
 - (void)keyUp:(NSEvent *)event {
-    NSLog(@"Key up: %d", event.keyCode);
-    
-    switch (event.keyCode) {
-        case 123:   // arrrow (left)
-            currentJoy1X = 0;
-            break;
-        case 124:   // arrrow (right)
-            currentJoy1X = 0;
-            break;
-        case 125:   // arrrow (down)
-            currentJoy1Y = 0;
-            break;
-        case 126:   // arrrow (up)
-            currentJoy1Y = 0;
-            break;
-        case 18:   // 1
-            BIT_CLEAR(currentButtonState, 0);
-            break;
-        case 19:   // 2
-            BIT_CLEAR(currentButtonState, 1);
-            break;
-        case 20:   // 3
-            BIT_CLEAR(currentButtonState, 2);
-            break;
-        case 21:   // 4
-            BIT_CLEAR(currentButtonState, 3);
-            break;
-    }
+    [self setInputState:event.keyCode press:false];
 }
 
 - (void)mouseDown:(NSEvent*)theEvent {
@@ -163,10 +139,18 @@ int  v_printStringRaster(int8_t x, int8_t y, char* str, int8_t xSize, int8_t ySi
     self.renderImageView = [[NSImageView alloc] initWithFrame:frame];
     self.renderImageView.imageScaling = NSImageScaleProportionallyUpOrDown;
     self.renderImageView.imageAlignment = NSImageAlignCenter;
+    self.renderImageView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     [self addSubview:self.renderImageView];
 
     self.renderImageView.wantsLayer = true;
     self.renderImageView.layer.backgroundColor = [NSColor blackColor].CGColor;
+
+    NSRect rect = NSMakeRect(10, 10, 200, 20);
+    self.infoField = [[NSTextField alloc] initWithFrame:rect];
+    self.infoField.bezeled = false;
+    self.infoField.editable = false;
+    self.infoField.backgroundColor = NSColor.clearColor;
+    [self addSubview:self.infoField];
 
     return self;
 }
@@ -229,10 +213,13 @@ void fb_clear(void) {
 
 void fb_render() {
     NSImage *image = [NSImage imageWithBuffer:pixel_buffer width:render_width height:render_height];
-    [AppDelegate renderPlayground:image];
+    [AppDelegate renderPlayground:image lines:line_count];
 }
 
 void fb_set_pixel(int x, int y, int color) {
+    if (color >= 0)
+        color += 127/2;
+
     // Is the pixel actually visible?
     if (x >= 0 && x < render_width && y >= 0 && y < render_height) {
         
@@ -241,10 +228,18 @@ void fb_set_pixel(int x, int y, int color) {
         // Use this to make the origin top-left instead of bottom-right.
         offset = (x + y * render_width) * 4;
         
-        pixel_buffer[offset] = color;
-        pixel_buffer[offset+1] = color;
-        pixel_buffer[offset+2] = color;
-        pixel_buffer[offset+3] = 255;
+        if (color == -2) {
+            pixel_buffer[offset] = 255;
+            pixel_buffer[offset+1] = 0;
+            pixel_buffer[offset+2] = 0;
+            pixel_buffer[offset+3] = 255;
+        }
+        else {
+            pixel_buffer[offset] = color;
+            pixel_buffer[offset+1] = color;
+            pixel_buffer[offset+2] = color;
+            pixel_buffer[offset+3] = color;
+        }
     }
 }
 
@@ -422,9 +417,9 @@ void fb_draw_char(int x, int y, char ch, int color) {
 }
 
 void fb_draw_string(int x, int y, char* str, int textSize, int color) {
+    y = 256-y;
     x += 127;
-    y += 127;
-
+    
     while (*str != 0) {
         char ch = *str;
     
@@ -433,4 +428,9 @@ void fb_draw_string(int x, int y, char* str, int textSize, int color) {
         
         str++;
     }
+}
+
+void platform_set_size(int width, int height) {
+    int size = MAX(width, height);
+    [PlaygroundView setRenderSize:size height:size];
 }

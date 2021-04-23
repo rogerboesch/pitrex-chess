@@ -8,7 +8,20 @@
 #import "AppDelegate.h"
 #import "PlaygroundView.h"
 
-int chess_main(void);
+const char* platform_bundle_file_path(const char* filename, const char* extension) {
+    NSString* path = [[NSBundle mainBundle] pathForResource:[NSString stringWithUTF8String:filename] ofType:[NSString stringWithUTF8String:extension]];
+    if (path == NULL) {
+        return "";
+    }
+
+    return [path UTF8String];
+}
+
+double platform_get_ms(void) {
+    return CFAbsoluteTimeGetCurrent();
+}
+
+int game_main(void);
 
 @interface AppDelegate ()
 
@@ -30,13 +43,14 @@ int chess_main(void);
     NSString* title = [NSString stringWithUTF8String:name];
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        [AppDelegate sharedDelegate].window.title = title;
+        NSString* str = [NSString stringWithFormat:@"PiTrex Playground: %@", title];
+        [AppDelegate sharedDelegate].window.title = str;
     });
 }
 
-+ (void)renderPlayground:(NSImage *)image {
++ (void)renderPlayground:(NSImage *)image lines:(int)lines {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[AppDelegate sharedDelegate].view render:image];
+        [[AppDelegate sharedDelegate].view render:image lines:lines];
     });
 }
 
@@ -56,7 +70,7 @@ int chess_main(void);
 }
 
 - (void)createWindow:(NSString *)title {
-    NSRect contentRect = NSMakeRect(5, 110, 1024, 768);
+    NSRect contentRect = NSMakeRect(5, 110, 800, 600);
     NSWindowStyleMask styleMask = NSWindowStyleMaskTitled|NSWindowStyleMaskClosable|NSWindowStyleMaskMiniaturizable|NSWindowStyleMaskResizable;
 
     self.window = [[NSWindow alloc] initWithContentRect:contentRect styleMask:styleMask backing:NSBackingStoreBuffered defer:true];
@@ -64,6 +78,7 @@ int chess_main(void);
     self.window.delegate = self;
 
     self.view = [[PlaygroundView alloc] initWithFrame:self.window.contentView.bounds];
+    self.view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     [self.window.contentView addSubview:self.view];
 
     [self.window makeKeyAndOrderFront:nil];
@@ -75,7 +90,7 @@ int chess_main(void);
 }
 
 - (void)start {
-    chess_main();
+    game_main();
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
@@ -84,8 +99,3 @@ int chess_main(void);
 }
 
 @end
-
-void platform_set_size(int width, int height) {
-    int size = MAX(width, height);
-    [PlaygroundView setRenderSize:size height:size];
-}

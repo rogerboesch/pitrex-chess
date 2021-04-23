@@ -10,7 +10,7 @@
 @interface AppDelegate : NSObject <NSApplicationDelegate, NSWindowDelegate>
 
 + (void)setName:(char *)name;
-+ (void)renderPlayground:(NSImage *)image;
++ (void)renderPlayground:(NSImage *)image lines:(int)lines;
 
 @end
 
