@@ -55,7 +55,7 @@ $(BUILD_DIR)rb_server.o: rb_server.c
 
 
 # build
-chess: $(BUILD_DIR)chess_main.o $(BUILD_DIR)chess_engine.o $(BUILD_DIR)platform.o $(BUILD_DIR)bcm2835.o $(BUILD_DIR)pitrexio-gpio.o $(BUILD_DIR)vectrexInterface.o $(BUILD_DIR)osWrapper.o $(BUILD_DIR)baremetalUtil.o $(BUILD_DIR)window.o
+chess: $(BUILD_DIR)chess_main.o $(BUILD_DIR)chess_engine.o $(BUILD_DIR)platform.o $(BUILD_DIR)rb_server.o $(BUILD_DIR)bcm2835.o $(BUILD_DIR)pitrexio-gpio.o $(BUILD_DIR)vectrexInterface.o $(BUILD_DIR)osWrapper.o $(BUILD_DIR)baremetalUtil.o $(BUILD_DIR)window.o
 	$(RM) chess
 	$(CC) $(CFLAGS) -o chess \
 	$(BUILD_DIR)bcm2835.o \
