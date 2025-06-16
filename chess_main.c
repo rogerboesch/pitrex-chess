@@ -642,7 +642,7 @@ boolean user_move() {
     int to = game_to_y*8+game_to_x;
 
     int result = chess_user_move(from, to);
-    if (result == -2) {
+    if (result == -3) {
         // No move found anymore, mate?
         game_change_state(COMPUTER_WIN);
         return false;
